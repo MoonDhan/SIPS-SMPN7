@@ -21,14 +21,14 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
-                <div class="brand-icon">
-                    <i class="fas fa-school"></i>
-                </div>
-                <div class="brand-text">
-                    <span>SMPN 7 Jember</span>
-                    <small>Sistem Pelanggaran</small>
-                </div>
-            </div>
+    <div class="brand-icon">
+        <img src="{{ asset('images/logo-smp.png') }}" alt="Logo SMP Negeri 7 Jember" class="brand-logo">
+    </div>
+    <div class="brand-text">
+        <span>SMPN 7 Jember</span>
+        <small>Sistem Pelanggaran</small>
+    </div>
+</div>
             
             <nav class="sidebar-nav">
                 <a href="{{ route('dashboard') }}" class="nav-item">
