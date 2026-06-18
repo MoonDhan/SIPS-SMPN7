@@ -30,7 +30,7 @@
     <nav class="nav-container">
         <a href="{{ url('/') }}" class="logo">
             <div class="logo-icon">
-                <img src="{{ asset('images/logo-smp.png') }}" alt="Logo SMP Negeri 7 Jember" class="logo-image">
+                <img src="{{ asset('images/logo-smp.svg') }}" alt="Logo SMP Negeri 7 Jember" class="logo-image">
             </div>
             <div class="logo-text">
                 <span>SMP Negeri 7 Jember</span>

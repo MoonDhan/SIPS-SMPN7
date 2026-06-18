@@ -18,62 +18,7 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <div class="dashboard-wrapper">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-brand">
-    <div class="brand-icon">
-        <img src="{{ asset('images/logo-smp.png') }}" alt="Logo SMP Negeri 7 Jember" class="brand-logo">
-    </div>
-    <div class="brand-text">
-        <span>SMPN 7 Jember</span>
-        <small>Sistem Pelanggaran</small>
-    </div>
-</div>
-            
-            <nav class="sidebar-nav">
-                <a href="{{ route('dashboard') }}" class="nav-item">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="{{ route('data-siswa') }}" class="nav-item active">
-                    <i class="fas fa-user-graduate"></i>
-                    <span>Data Siswa</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span>Pelanggaran</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Laporan</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-users"></i>
-                    <span>Guru BK</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-cog"></i>
-                    <span>Pengaturan</span>
-                </a>
-            </nav>
-
-            <div class="sidebar-footer">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
-                    </button>
-                </form>
-                <div class="user-info">
-                    <div class="user-avatar">
-                        {{ substr(auth()->user()->name, 0, 1) }}
-                    </div>
-                    <div class="user-name">{{ auth()->user()->name }}</div>
-                    <small>{{ auth()->user()->jabatan ?? 'Guru BK' }}</small>
-                </div>
-            </div>
-        </aside>
+        <x-admin-sidebar />
 
         <!-- Main Content -->
         <main class="main-content">
@@ -92,7 +37,7 @@
                     </div>
                     <div class="search-box">
                         <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Cari siswa..." id="searchSiswa">
+                        <input type="text" placeholder="Cari NIS, NISN, atau nama..." id="searchSiswa">
                     </div>
                 </div>
             </header>
@@ -183,6 +128,7 @@
                         <thead>
                             <tr>
                                 <th>No</th>
+                                <th>NIS</th>
                                 <th>NISN</th>
                                 <th>Nama Siswa</th>
                                 <th>Kelas</th>
@@ -229,9 +175,15 @@
             <div class="modal-body">
                 <form id="formSiswa">
                     <input type="hidden" id="editId" value="">
-                    <div class="form-group">
-                        <label>NISN</label>
-                        <input type="text" id="nisn" class="form-input" placeholder="Masukkan NISN" required>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>NIS</label>
+                            <input type="text" id="nis" class="form-input" placeholder="Nomor Induk Sekolah" required>
+                        </div>
+                        <div class="form-group">
+                            <label>NISN</label>
+                            <input type="text" id="nisn" class="form-input" placeholder="Nomor Induk Siswa Nasional" required>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Nama Lengkap</label>

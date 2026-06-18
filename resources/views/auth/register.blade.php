@@ -22,7 +22,7 @@
     <div class="splash-screen" id="splashScreen">
         <div class="splash-content">
             <div class="splash-logo-wrapper">
-                <img src="{{ asset('images/logo-smp.png') }}" alt="Logo SMP Negeri 7 Jember" class="splash-logo" id="splashLogo">
+                <img src="{{ asset('images/logo-smp.svg') }}" alt="Logo SMP Negeri 7 Jember" class="splash-logo" id="splashLogo">
             </div>
             <h2 class="splash-title">SMP Negeri 7 Jember</h2>
             <p class="splash-subtitle">Sistem Informasi Pelanggaran Siswa</p>
@@ -39,7 +39,7 @@
             <div class="school-overlay"></div>
             <div class="school-content">
                 <div class="school-icon">
-                    <img src="{{ asset('images/logo-smp.png') }}" alt="Logo SMPN 7 Jember" class="school-logo-img">
+                    <img src="{{ asset('images/logo-smp.svg') }}" alt="Logo SMPN 7 Jember" class="school-logo-img">
                 </div>
                 <h2>SMP Negeri 7 Jember</h2>
                 <p>Sistem Informasi Pelanggaran Siswa</p>
