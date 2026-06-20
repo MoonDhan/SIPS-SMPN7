@@ -22,15 +22,15 @@
             <i class="fas fa-exclamation-triangle"></i>
             <span>Pelanggaran</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="{{ route('laporan') }}" class="nav-item {{ request()->routeIs('laporan') ? 'active' : '' }}">
             <i class="fas fa-chart-line"></i>
             <span>Laporan</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="{{ route('guru-bk.index') }}" class="nav-item {{ request()->routeIs('guru-bk.*') ? 'active' : '' }}">
             <i class="fas fa-users"></i>
             <span>Guru BK</span>
         </a>
-        <a href="#" class="nav-item">
+        <a href="{{ route('pengaturan') }}" class="nav-item {{ request()->routeIs('pengaturan') ? 'active' : '' }}">
             <i class="fas fa-cog"></i>
             <span>Pengaturan</span>
         </a>
@@ -46,7 +46,11 @@
         </form>
         <div class="user-info">
             <div class="user-avatar">
-                {{ substr(auth()->user()->name, 0, 1) }}
+                @if(auth()->user()->foto && file_exists(public_path(auth()->user()->foto)))
+                    <img src="{{ asset(auth()->user()->foto) }}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                @else
+                    {{ substr(auth()->user()->name, 0, 1) }}
+                @endif
             </div>
             <div class="user-name">{{ auth()->user()->name }}</div>
             <small>{{ auth()->user()->jabatan ?? 'Guru BK' }}</small>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pelanggaran;
 use App\Models\Siswa;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -45,6 +46,43 @@ class DashboardController extends Controller
         return response()->json(['data' => $pelanggarans]);
     }
 
+    /**
+     * Endpoint khusus notifikasi real-time.
+     * Mengembalikan pelanggaran yang masuk HARI INI.
+     * Mendukung parameter ?after_id=X untuk polling inkremental.
+     */
+    public function notificationsToday(Request $request): JsonResponse
+    {
+        $query = Pelanggaran::with('siswa')
+            ->whereDate('created_at', today())
+            ->latest('id');
+
+        // Jika client mengirim after_id, hanya kembalikan data yang lebih baru
+        if ($request->filled('after_id')) {
+            $query->where('id', '>', (int) $request->after_id);
+        }
+
+        $items = $query->limit(20)->get()->map(fn (Pelanggaran $p) => [
+            'id'          => $p->id,
+            'siswa'       => $p->siswa?->nama_lengkap ?? '-',
+            'kelas'       => $p->siswa?->kelas ?? '-',
+            'pelanggaran' => $p->jenis_pelanggaran,
+            'kategori'    => ucfirst($p->kategori),
+            'poin'        => $p->poin,
+            'waktu'       => $p->created_at->format('H:i'),
+            'tanggal'     => $p->created_at->format('d/m/Y'),
+        ]);
+
+        $latestId = Pelanggaran::whereDate('created_at', today())->max('id') ?? 0;
+        $totalToday = Pelanggaran::whereDate('created_at', today())->count();
+
+        return response()->json([
+            'data'      => $items,
+            'count'     => $totalToday,
+            'latest_id' => $latestId,
+        ]);
+    }
+
     public function charts(): JsonResponse
     {
         $byJenis = Pelanggaran::select('jenis_pelanggaran', DB::raw('count(*) as frekuensi'))
@@ -67,7 +105,7 @@ class DashboardController extends Controller
             'by_kategori' => [
                 'ringan' => $byKategori->get('ringan', 0),
                 'sedang' => $byKategori->get('sedang', 0),
-                'berat' => $byKategori->get('berat', 0),
+                'berat'  => $byKategori->get('berat', 0),
             ],
         ]);
     }

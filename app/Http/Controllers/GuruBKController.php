@@ -1,0 +1,105 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+
+class GuruBKController extends Controller
+{
+    public function index()
+    {
+        $guru_bk = User::where('role', 'admin_bk')->latest()->get();
+        return view('guru-bk.index', compact('guru_bk'));
+    }
+
+    public function create()
+    {
+        return view('guru-bk.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'nuptk' => 'nullable|string|size:16|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'jabatan' => 'required|string|max:255',
+            'no_hp' => 'nullable|string|max:20',
+            'alamat' => 'nullable|string',
+            'is_active' => 'required|boolean',
+        ]);
+
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'nuptk' => $request->nuptk,
+            'password' => Hash::make($request->password),
+            'jabatan' => $request->jabatan,
+            'role' => 'admin_bk',
+            'no_hp' => $request->no_hp,
+            'alamat' => $request->alamat,
+            'is_active' => $request->is_active,
+        ]);
+
+        return redirect()->route('guru-bk.index')->with('success', 'Akun Guru BK berhasil ditambahkan!');
+    }
+
+    public function edit($id)
+    {
+        $guru = User::findOrFail($id);
+        return view('guru-bk.edit', compact('guru'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $guru = User::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($guru->id)],
+            'nuptk' => ['nullable', 'string', 'size:16', Rule::unique('users')->ignore($guru->id)],
+            'password' => 'nullable|string|min:8|confirmed',
+            'jabatan' => 'required|string|max:255',
+            'no_hp' => 'nullable|string|max:20',
+            'alamat' => 'nullable|string',
+            'is_active' => 'required|boolean',
+        ]);
+
+        $data = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'nuptk' => $request->nuptk,
+            'jabatan' => $request->jabatan,
+            'no_hp' => $request->no_hp,
+            'alamat' => $request->alamat,
+            'is_active' => $request->is_active,
+        ];
+
+        // Hanya update password jika diisi
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $guru->update($data);
+
+        return redirect()->route('guru-bk.index')->with('success', 'Data Guru BK berhasil diperbarui!');
+    }
+
+    public function destroy($id)
+    {
+        $guru = User::findOrFail($id);
+
+        // Jangan biarkan user menghapus dirinya sendiri
+        if (auth()->id() === $guru->id) {
+            return redirect()->route('guru-bk.index')->with('error', 'Anda tidak dapat menghapus akun Anda sendiri yang sedang digunakan!');
+        }
+
+        $guru->delete();
+
+        return redirect()->route('guru-bk.index')->with('success', 'Akun Guru BK berhasil dihapus!');
+    }
+}

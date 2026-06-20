@@ -3,6 +3,10 @@
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\SiswaController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PelanggaranController;
+use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\GuruBKController;
+use App\Http\Controllers\PengaturanController;
 use Illuminate\Support\Facades\Route;
 // Tambahkan use model Siswa agar lebih rapi (Opsional, tapi best practice)
 use App\Models\Siswa;
@@ -31,18 +35,10 @@ Route::middleware('auth')->group(function () {
     // ------------------------------------------
     
     // 1. Menampilkan daftar pelanggaran
-    Route::get('/pelanggaran', function () {
-        return view('pelanggaran', ['data_pelanggaran' => []]); 
-    })->name('pelanggaran');
+    Route::get('/pelanggaran', [PelanggaranController::class, 'index'])->name('pelanggaran');
 
     // 2. Menampilkan form tambah pelanggaran baru (INI YANG DIPERBAIKI)
-    Route::get('/pelanggaran/create', function () {
-        // Mengambil semua data siswa dari tabel untuk dropdown pencarian
-        // Asumsi nama model adalah 'Siswa' dan nama kolomnya 'nama_lengkap'
-        $data_siswa = \App\Models\Siswa::orderBy('nama_lengkap', 'asc')->get(); 
-        
-        return view('pelanggaran-create', compact('data_siswa'));
-    })->name('pelanggaran.create');
+    Route::get('/pelanggaran/create', [PelanggaranController::class, 'create'])->name('pelanggaran.create');
 
     // 3. Menampilkan form edit pelanggaran
     Route::get('/pelanggaran/{id}/edit', function ($id) {
@@ -55,11 +51,19 @@ Route::middleware('auth')->group(function () {
     })->name('pelanggaran.destroy');
 
     // 5. Proses menyimpan data pelanggaran baru (Pintu Penerima POST)
-    Route::post('/pelanggaran', function (\Illuminate\Http\Request $request) {
-        // Nanti di sini kita tulis logika untuk menyimpan data ke database (Controller).
-        // Untuk sementara, kita buat pura-pura berhasil dan langsung kembali ke halaman daftar.
-        return redirect()->route('pelanggaran')->with('success', 'Data pelanggaran berhasil dicatat!');
-    })->name('pelanggaran.store');
+    Route::post('/pelanggaran', [PelanggaranController::class, 'store'])->name('pelanggaran.store');
+
+    // 6. Halaman Laporan Pelanggaran
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan');
+
+    // 7. Manajemen Guru BK
+    Route::resource('guru-bk', GuruBKController::class);
+
+    // 8. Pengaturan Lengkap (Profil, Password, Instansi)
+    Route::get('/pengaturan', [PengaturanController::class, 'index'])->name('pengaturan');
+    Route::post('/pengaturan/profile', [PengaturanController::class, 'updateProfile'])->name('pengaturan.profile');
+    Route::post('/pengaturan/password', [PengaturanController::class, 'updatePassword'])->name('pengaturan.password');
+    Route::post('/pengaturan/aplikasi', [PengaturanController::class, 'updateAplikasi'])->name('pengaturan.aplikasi');
 
     // ------------------------------------------
     // RUTE PROFILE (Bawaan Laravel Breeze)
@@ -75,6 +79,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
         Route::get('/dashboard/recent', [DashboardController::class, 'recent']);
         Route::get('/dashboard/charts', [DashboardController::class, 'charts']);
+        Route::get('/notifications/today', [DashboardController::class, 'notificationsToday']);
         
         Route::get('/siswa/stats', [SiswaController::class, 'stats']);
         Route::get('/siswa', [SiswaController::class, 'index']);

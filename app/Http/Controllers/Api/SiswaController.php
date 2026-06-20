@@ -47,6 +47,19 @@ class SiswaController extends Controller
         ]);
     }
 
+    /**
+     * Kembalikan daftar kelas unik yang ada di database, diurutkan.
+     */
+    public function kelas(): JsonResponse
+    {
+        $kelas = Siswa::distinct()
+            ->whereNotNull('kelas')
+            ->orderBy('kelas')
+            ->pluck('kelas');
+
+        return response()->json(['data' => $kelas]);
+    }
+
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([

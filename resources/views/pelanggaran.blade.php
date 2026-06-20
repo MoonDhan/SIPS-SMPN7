@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
-    @vite(['resources/css/dashboard.css', 'resources/js/dashboard.js'])
+    @vite(['resources/css/dashboard.css', 'resources/js/pelanggaran.js'])
     
     <style>
         /* Sedikit tambahan CSS agar tombolnya rapi */
@@ -18,6 +18,10 @@
         .btn-tambah:hover { background-color: #2e59d9; color: white; }
         .btn-edit { background-color: #f6c23e; color: #fff; }
         .btn-delete { background-color: #e74a3b; color: #fff; border: none; cursor: pointer; }
+        .badge-kategori { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: capitalize; display: inline-block; }
+        .badge-kategori-ringan { background-color: #d1e7dd; color: #0f5132; }
+        .badge-kategori-sedang { background-color: #fff3cd; color: #664d03; }
+        .badge-kategori-berat { background-color: #f8d7da; color: #842029; }
     </style>
 </head>
 <body>
@@ -37,7 +41,7 @@
                 <div class="topbar-right">
                     <div class="notification">
                         <i class="fas fa-bell"></i>
-                        <span class="badge">3</span>
+                        <span class="badge">0</span>
                     </div>
                     <div class="search-box">
                         <i class="fas fa-search"></i>
@@ -69,6 +73,7 @@
                                 <th>Nama Siswa</th>
                                 <th>Kelas</th>
                                 <th>Bentuk Pelanggaran</th>
+                                <th>Kategori</th>
                                 <th>Poin</th>
                                 <th style="text-align: center;">Aksi</th>
                             </tr>
@@ -77,10 +82,15 @@
                             @forelse ($data_pelanggaran as $index => $item)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
-                                <td>{{ $item->tanggal ?? '-' }}</td>
+                                <td>{{ $item->tanggal_pelanggaran ? $item->tanggal_pelanggaran->format('d/m/Y') : '-' }}</td>
                                 <td>{{ $item->siswa->nama_lengkap ?? 'Data Tidak Ditemukan' }}</td>
                                 <td>{{ $item->siswa->kelas ?? '-' }}</td>
                                 <td>{{ $item->jenis_pelanggaran ?? '-' }}</td>
+                                <td>
+                                    <span class="badge-kategori badge-kategori-{{ $item->kategori ?? 'ringan' }}">
+                                        {{ $item->kategori ?? '-' }}
+                                    </span>
+                                </td>
                                 <td style="color: #e74a3b; font-weight: bold;">+{{ $item->poin ?? 0 }}</td>
                                 <td style="text-align: center;">
                                     <a href="{{ route('pelanggaran.edit', $item->id ?? 1) }}" class="btn-action btn-edit">
@@ -97,7 +107,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="7" style="text-align: center; padding: 20px;">Belum ada data pelanggaran yang tercatat.</td>
+                                <td colspan="8" style="text-align: center; padding: 20px;">Belum ada data pelanggaran yang tercatat.</td>
                             </tr>
                             @endforelse
                         </tbody>

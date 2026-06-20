@@ -4,6 +4,7 @@
  */
 
 import './bootstrap';
+import { initNotifications } from './notifications';
 
 let siswaData = [];
 let currentPage = 1;
@@ -280,7 +281,156 @@ function debounce(fn, delay) {
     };
 }
 
+async function loadNotifications(container) {
+    try {
+        const { data } = await window.axios.get('/api/dashboard/recent');
+        container.innerHTML = '';
+
+        if (!data.data || data.data.length === 0) {
+            container.innerHTML = '<div style="padding: 16px; text-align: center; color: #858796; font-size: 13px;">Tidak ada notifikasi baru</div>';
+            return;
+        }
+
+        // Ambil 3 notifikasi teratas
+        const recentNotifs = data.data.slice(0, 3);
+        
+        // Update badge count
+        const badge = document.querySelector('.notification .badge');
+        if (badge) {
+            badge.textContent = recentNotifs.length;
+        }
+        const countLabel = document.getElementById('notif-count');
+        if (countLabel) {
+            countLabel.textContent = `${recentNotifs.length} Baru`;
+        }
+
+        const badgeColor = { Ringan: '#10b981', Sedang: '#f59e0b', Berat: '#ef4444' };
+
+        recentNotifs.forEach(item => {
+            const div = document.createElement('div');
+            div.style.cssText = `
+                padding: 12px 16px;
+                border-bottom: 1px solid #eaecf4;
+                transition: background 0.2s;
+                font-size: 13px;
+                color: #333;
+                cursor: pointer;
+            `;
+            div.addEventListener('mouseenter', () => div.style.backgroundColor = '#f8f9fc');
+            div.addEventListener('mouseleave', () => div.style.backgroundColor = 'transparent');
+            
+            const color = badgeColor[item.kategori] || '#10b981';
+
+            div.innerHTML = `
+                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                    <div style="width: 8px; height: 8px; border-radius: 50%; background: ${color}; margin-top: 4px; flex-shrink: 0;"></div>
+                    <div style="flex: 1;">
+                        <strong style="color: #4e73df;">${item.siswa} (${item.kelas})</strong>
+                        <div style="color: #666; margin-top: 2px;">Melakukan pelanggaran: <em>${item.pelanggaran}</em></div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 11px; color: #999;">
+                            <span>${item.tanggal}</span>
+                            <span style="font-weight: 700; color: #ef4444;">+${item.poin} Poin</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            div.addEventListener('click', () => {
+                window.location.href = '/pelanggaran';
+            });
+            container.appendChild(div);
+        });
+    } catch (error) {
+        console.error('Gagal memuat notifikasi:', error);
+        container.innerHTML = '<div style="padding: 16px; text-align: center; color: #e74a3b; font-size: 13px;">Gagal memuat data</div>';
+    }
+}
+
+async function initNotificationDropdown() {
+    const notificationContainer = document.querySelector('.notification');
+    if (!notificationContainer) return;
+
+    notificationContainer.style.cursor = 'pointer';
+    notificationContainer.style.position = 'relative';
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'notification-dropdown';
+    dropdown.style.cssText = `
+        position: absolute;
+        top: 50px;
+        right: 0;
+        width: 320px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border: 1px solid #eaecf4;
+        display: none;
+        z-index: 1000;
+        cursor: default;
+        text-align: left;
+        overflow: hidden;
+        font-family: 'Inter', sans-serif;
+    `;
+
+    const header = document.createElement('div');
+    header.style.cssText = `
+        padding: 12px 16px;
+        background: #4e73df;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    `;
+    header.innerHTML = `<span>Notifikasi Pelanggaran</span><small id="notif-count" style="background:rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px; font-size:11px;">3 Baru</small>`;
+    dropdown.appendChild(header);
+
+    const list = document.createElement('div');
+    list.id = 'notif-list';
+    list.style.cssText = `
+        max-height: 280px;
+        overflow-y: auto;
+    `;
+    list.innerHTML = `<div style="padding: 16px; text-align: center; color: #858796; font-size: 13px;"><i class="fas fa-spinner fa-spin"></i> Memuat...</div>`;
+    dropdown.appendChild(list);
+
+    const footer = document.createElement('div');
+    footer.style.cssText = `
+        padding: 10px;
+        text-align: center;
+        border-top: 1px solid #eaecf4;
+        background: #f8f9fc;
+    `;
+    footer.innerHTML = `<a href="/pelanggaran" style="color: #4e73df; text-decoration: none; font-size: 12px; font-weight: 600;">Lihat Semua Pelanggaran</a>`;
+    dropdown.appendChild(footer);
+
+    notificationContainer.appendChild(dropdown);
+
+    notificationContainer.addEventListener('click', async (e) => {
+        if (e.target.closest('.notification-dropdown')) {
+            return;
+        }
+        
+        e.stopPropagation();
+        const isOpen = dropdown.style.display === 'block';
+        
+        document.querySelectorAll('.notification-dropdown').forEach(d => d.style.display = 'none');
+        
+        if (!isOpen) {
+            dropdown.style.display = 'block';
+            await loadNotifications(list);
+        } else {
+            dropdown.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('click', () => {
+        dropdown.style.display = 'none';
+    });
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     await loadStats();
     await loadSiswa();
+    initNotifications(); // real-time notification (polling)
 });

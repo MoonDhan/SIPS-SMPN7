@@ -34,7 +34,7 @@
                 <div class="topbar-right">
                     <div class="notification">
                         <i class="fas fa-bell"></i>
-                        <span class="badge">3</span>
+                        <span class="badge">0</span>
                     </div>
                     <div class="search-box">
                         <i class="fas fa-search"></i>
@@ -43,7 +43,7 @@
                 </div>
             </header>
 
-            <!-- Stats Cards -->
+            <!-- Stats Cardss -->
             <section class="stats-section">
                 <div class="stats-grid">
                     <div class="stat-card">

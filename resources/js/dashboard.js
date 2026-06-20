@@ -4,6 +4,7 @@
  */
 
 import './bootstrap';
+import { initNotifications } from './notifications';
 
 const statusLabel = { selesai: 'Selesai', proses: 'Proses BK' };
 
@@ -192,10 +193,13 @@ function initChartButtons() {
     });
 }
 
+// Notifikasi real-time ditangani oleh notifications.js
+
 document.addEventListener('DOMContentLoaded', () => {
     loadStats();
     loadRecentTable();
     loadCharts();
     initSidebarToggle();
     initChartButtons();
+    initNotifications(); // real-time notification (polling)
 });

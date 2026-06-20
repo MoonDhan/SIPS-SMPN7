@@ -11,7 +11,7 @@
     
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     
-    @vite(['resources/css/dashboard.css', 'resources/js/dashboard.js'])
+    @vite(['resources/css/dashboard.css', 'resources/js/pelanggaran.js'])
     
     <style>
         .form-section { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin: 20px; }
@@ -51,7 +51,7 @@
                 <div class="topbar-right">
                     <div class="notification">
                         <i class="fas fa-bell"></i>
-                        <span class="badge">3</span>
+                        <span class="badge">0</span>
                     </div>
                 </div>
             </header>
@@ -94,6 +94,15 @@
                     <div class="form-group">
                         <label for="jenis_pelanggaran">Bentuk Pelanggaran <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="jenis_pelanggaran" name="jenis_pelanggaran" placeholder="Contoh: Terlambat masuk sekolah, atribut tidak lengkap..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="kategori">Kategori Pelanggaran <span class="text-danger">*</span></label>
+                        <select class="form-control" id="kategori" name="kategori" required>
+                            <option value="ringan">Ringan</option>
+                            <option value="sedang">Sedang</option>
+                            <option value="berat">Berat</option>
+                        </select>
                     </div>
 
                     <div class="form-group">

@@ -28,17 +28,25 @@ class PelanggaranController extends Controller
     {
         // Validasi dasar
         $request->validate([
-            'siswa_id' => 'required',
-            'jenis_pelanggaran' => 'required',
-            'poin' => 'required|numeric',
+            'siswa_id' => 'required|exists:siswa,id',
+            'jenis_pelanggaran' => 'required|string',
+            'kategori' => 'required|in:ringan,sedang,berat',
+            'poin' => 'required|numeric|min:1',
+            'tanggal' => 'required|date',
+            'catatan' => 'nullable|string',
         ]);
 
-        // Menggabungkan data dari form
-        $data = $request->all();
-        
-        // Menambahkan data tambahan otomatis
-        $data['user_id'] = auth()->id(); // User yang sedang login
-        $data['status'] = 'Proses';      // Status default
+        // Menggabungkan data dari form ke kolom database
+        $data = [
+            'siswa_id' => $request->siswa_id,
+            'jenis_pelanggaran' => $request->jenis_pelanggaran,
+            'kategori' => $request->kategori,
+            'poin' => $request->poin,
+            'tanggal_pelanggaran' => $request->tanggal,
+            'deskripsi' => $request->catatan,
+            'user_id' => auth()->id() ?? 1, // Menggunakan user yang sedang login, fallback ke 1 jika null
+            'status' => 'proses', // lowercase sesuai enum database
+        ];
 
         Pelanggaran::create($data);
 
