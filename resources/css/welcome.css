@@ -1,8 +1,72 @@
 /* ========================================
    WELCOME PAGE - SISTEM PELANGGARAN SISWA
    SMP Negeri 7 Jember
-   THEME: PUTIH / TERANG
+   THEME: PUTIH / TERANG + DARK MODE SUPPORT
    ======================================== */
+
+:root {
+    --bg-page: linear-gradient(135deg, #f5f7fa 0%, #ffffff 50%, #f0f4f8 100%);
+    --text-page: #1e293b;
+    --bg-card: #ffffff;
+    --bg-card-alt: #f8fafc;
+    --border-color: #e2e8f0;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --text-heading: #1e293b;
+    --bg-badge: #dbeafe;
+    --text-badge: #1e40af;
+    --bg-btn-secondary: #ffffff;
+    --text-btn-secondary: #475569;
+    --bg-selector: #f1f5f9;
+    --text-selector: #475569;
+    --bg-slider-nav: #ffffff;
+    --border-slider-nav: #e2e8f0;
+    --bg-slider-dot: #cbd5e1;
+    --bg-slide-img: #eff6ff;
+    --border-slide-img: #bfdbfe;
+    --text-slide-caption: #1e293b;
+    --text-slide-caption-sub: #64748b;
+    --bg-badge-item: #f1f5f9;
+    --text-badge-item: #475569;
+    --bg-header: rgba(255,255,255,0.9);
+    --bg-header-scrolled: rgba(255,255,255,0.98);
+    --border-header: rgba(0,0,0,0.08);
+    --logo-text-color: #64748b;
+    --text-nav-login: #475569;
+    --bg-footer-border: #e2e8f0;
+}
+
+[data-theme="dark"] {
+    --bg-page: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    --text-page: #f8fafc;
+    --bg-card: #1e293b;
+    --bg-card-alt: #0f172a;
+    --border-color: #334155;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --text-heading: #f8fafc;
+    --bg-badge: rgba(37,99,235,0.2);
+    --text-badge: #93c5fd;
+    --bg-btn-secondary: #1e293b;
+    --text-btn-secondary: #94a3b8;
+    --bg-selector: #0f172a;
+    --text-selector: #94a3b8;
+    --bg-slider-nav: #1e293b;
+    --border-slider-nav: #334155;
+    --bg-slider-dot: #475569;
+    --bg-slide-img: rgba(30,58,95,0.4);
+    --border-slide-img: #1e3a5f;
+    --text-slide-caption: #f8fafc;
+    --text-slide-caption-sub: #94a3b8;
+    --bg-badge-item: #0f172a;
+    --text-badge-item: #94a3b8;
+    --bg-header: rgba(15,23,42,0.9);
+    --bg-header-scrolled: rgba(15,23,42,0.98);
+    --border-header: rgba(255,255,255,0.06);
+    --logo-text-color: #94a3b8;
+    --text-nav-login: #94a3b8;
+    --bg-footer-border: #334155;
+}
 
 /* ----------------------------------------
    RESET & BASE STYLES
@@ -15,8 +79,8 @@
 
 body {
     font-family: 'Instrument Sans', sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 50%, #f0f4f8 100%);
-    color: #1e293b;
+    background: var(--bg-page);
+    color: var(--text-page);
     overflow-x: hidden;
 }
 
@@ -131,13 +195,13 @@ body {
     z-index: 20;
     width: 100%;
     padding: 1rem 1.5rem;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--bg-header);
     backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid var(--border-header);
     transition: all 0.3s ease;
 }
 .header-scrolled {
-    background: rgba(255, 255, 255, 0.98) !important;
+    background: var(--bg-header-scrolled) !important;
     backdrop-filter: blur(16px) !important;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
@@ -177,7 +241,7 @@ body {
     color: transparent;
     display: block;
 }
-.logo-text small { font-size: 0.7rem; color: #64748b; }
+.logo-text small { font-size: 0.7rem; color: var(--logo-text-color); }
 
 .nav-buttons { display: flex; align-items: center; gap: 0.75rem; }
 .btn-login, .btn-register, .btn-dashboard {
@@ -189,7 +253,7 @@ body {
     transition: all 0.2s ease;
 }
 .btn-login { 
-    color: #475569; 
+    color: var(--text-nav-login); 
     background: transparent; 
 }
 .btn-login:hover { background: rgba(0, 0, 0, 0.05); }
@@ -227,8 +291,8 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: #dbeafe;
-    color: #1e40af;
+    background: var(--bg-badge);
+    color: var(--text-badge);
     padding: 0.5rem 1rem;
     border-radius: 9999px;
     font-size: 0.875rem;
@@ -246,7 +310,7 @@ body {
 
 .hero-description {
     font-size: 1.125rem;
-    color: #475569;
+    color: var(--text-secondary);
     margin-bottom: 2rem;
     line-height: 1.625;
 }
@@ -274,12 +338,12 @@ body {
 }
 .btn-primary:hover { transform: translateY(-2px); }
 .btn-secondary {
-    background: white;
-    color: #475569;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-btn-secondary);
+    color: var(--text-btn-secondary);
+    border: 1px solid var(--border-color);
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
-.btn-secondary:hover { background: #f8fafc; transform: translateY(-2px); }
+.btn-secondary:hover { background: var(--bg-card-alt); transform: translateY(-2px); }
 
 .avatar-stack { display: flex; margin-right: -0.5rem; }
 .avatar {
@@ -302,10 +366,10 @@ body {
    ---------------------------------------- */
 .slider-container {
     position: relative;
-    background: white;
+    background: var(--bg-card);
     border-radius: 1rem;
     padding: 1rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
     box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
@@ -372,13 +436,13 @@ body {
 .slide-image-wrapper {
     width: 140px;
     height: 140px;
-    background: #eff6ff;
+    background: var(--bg-slide-img);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 1.5rem;
-    border: 2px solid #bfdbfe;
+    border: 2px solid var(--border-slide-img);
     transition: all 0.3s ease;
 }
 .hero-slide.active .slide-image-wrapper {
@@ -391,8 +455,8 @@ body {
 .hero-slide[data-slide="2"] .slide-icon { color: #10b981; }
 .hero-slide[data-slide="3"] .slide-icon { color: #8b5cf6; }
 .hero-slide[data-slide="4"] .slide-icon { color: #ef4444; }
-.slide-caption h4 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: #1e293b; }
-.slide-caption p { font-size: 0.875rem; color: #64748b; }
+.slide-caption h4 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-slide-caption); }
+.slide-caption p { font-size: 0.875rem; color: var(--text-slide-caption-sub); }
 
 .slider-dots {
     position: absolute;
@@ -407,7 +471,7 @@ body {
     width: 10px;
     height: 10px;
     border-radius: 9999px;
-    background: #cbd5e1;
+    background: var(--bg-slider-dot);
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -423,8 +487,8 @@ body {
     width: 36px;
     height: 36px;
     border-radius: 9999px;
-    background: white;
-    border: 1px solid #e2e8f0;
+    background: var(--bg-slider-nav);
+    border: 1px solid var(--border-slider-nav);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -458,11 +522,11 @@ body {
     margin-top: 1rem;
 }
 .badge-item {
-    background: #f1f5f9;
+    background: var(--bg-badge-item);
     padding: 0.25rem 0.75rem;
     border-radius: 0.5rem;
     font-size: 0.75rem;
-    color: #475569;
+    color: var(--text-badge-item);
 }
 
 /* ----------------------------------------
@@ -476,7 +540,7 @@ body {
 @media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
 
 .stat-card {
-    background: white;
+    background: var(--bg-card);
     border-radius: 1rem;
     padding: 1.5rem;
     text-align: center;
@@ -485,7 +549,7 @@ body {
     transform: translateY(30px);
     transition: opacity 0.6s ease, transform 0.6s ease;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
 }
 .stat-card.revealed { opacity: 1; transform: translateY(0); }
 .stat-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.15); }
@@ -498,15 +562,15 @@ body {
     background-clip: text;
     color: transparent;
 }
-.stat-card p { margin-top: 0.5rem; font-size: 0.875rem; color: #64748b; }
+.stat-card p { margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-muted); }
 
 /* ----------------------------------------
    VIOLATIONS SECTION - Light Theme
    ---------------------------------------- */
 .violations-section { margin-top: 6rem; }
 .section-header { text-align: center; margin-bottom: 3rem; }
-.section-header h2 { font-size: 1.875rem; font-weight: 700; margin-bottom: 1rem; color: #1e293b; }
-.section-header p { color: #64748b; max-width: 42rem; margin: 0 auto; }
+.section-header h2 { font-size: 1.875rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-heading); }
+.section-header p { color: var(--text-muted); max-width: 42rem; margin: 0 auto; }
 
 .violations-grid {
     display: grid;
@@ -515,7 +579,7 @@ body {
 @media (min-width: 1024px) { .violations-grid { grid-template-columns: repeat(3, 1fr); } }
 
 .violation-card {
-    background: white;
+    background: var(--bg-card);
     border-radius: 1rem;
     padding: 1.5rem;
     transition: all 0.3s ease;
@@ -547,7 +611,7 @@ body {
 .violation-card.ringan .card-icon i { color: #10b981; }
 .violation-card.sedang .card-icon i { color: #f59e0b; }
 .violation-card.berat .card-icon i { color: #ef4444; }
-.violation-card h3 { font-size: 1.25rem; font-weight: 700; color: #1e293b; }
+.violation-card h3 { font-size: 1.25rem; font-weight: 700; color: var(--text-heading); }
 
 .violation-card ul { list-style: none; margin-bottom: 1rem; }
 .violation-card li {
@@ -556,7 +620,7 @@ body {
     gap: 0.5rem;
     padding: 0.5rem 0;
     font-size: 0.875rem;
-    color: #475569;
+    color: var(--text-secondary);
 }
 .violation-card li i { width: 1.25rem; }
 .violation-card.ringan li i { color: #10b981; }
@@ -566,9 +630,9 @@ body {
 .card-footer {
     margin-top: 1rem;
     padding-top: 0.75rem;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border-color);
     font-size: 0.7rem;
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 /* ----------------------------------------
@@ -583,26 +647,26 @@ body {
 @media (min-width: 1024px) { .rules-grid { grid-template-columns: repeat(2, 1fr); } }
 .rules-grid > div:first-child { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
 .rules-grid > div:first-child.revealed { opacity: 1; transform: translateY(0); }
-.rules-grid h2 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; color: #1e293b; }
-.rules-grid > div:first-child p { color: #64748b; margin-bottom: 1.5rem; }
+.rules-grid h2 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-heading); }
+.rules-grid > div:first-child p { color: var(--text-muted); margin-bottom: 1.5rem; }
 .rules-grid ul { list-style: none; }
-.rules-grid li { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; color: #475569; }
+.rules-grid li { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; color: var(--text-secondary); }
 .rules-grid li i { color: #10b981; }
 
 .rules-quote {
-    background: #f8fafc;
+    background: var(--bg-card-alt);
     border-radius: 1rem;
     padding: 2rem;
     text-align: center;
     opacity: 0;
     transform: translateY(30px);
     transition: opacity 0.6s ease, transform 0.6s ease;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
 }
 .rules-quote.revealed { opacity: 1; transform: translateY(0); }
 .rules-quote i { font-size: 4rem; color: #3b82f6; opacity: 0.5; margin-bottom: 1rem; display: block; }
-.rules-quote blockquote { font-style: italic; color: #475569; margin-bottom: 0.5rem; }
-.rules-quote cite { font-size: 0.875rem; color: #64748b; }
+.rules-quote blockquote { font-style: italic; color: var(--text-secondary); margin-bottom: 0.5rem; }
+.rules-quote cite { font-size: 0.875rem; color: var(--text-muted); }
 
 /* ----------------------------------------
    CTA SECTION - Light Theme
@@ -645,12 +709,12 @@ body {
    FOOTER - Light Theme
    ---------------------------------------- */
 .footer {
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--bg-footer-border);
     margin-top: 5rem;
     padding: 2rem 1.5rem;
     text-align: center;
     font-size: 0.875rem;
-    color: #64748b;
+    color: var(--text-muted);
 }
 .social-icons { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1rem; }
 .social-icons i { font-size: 1.25rem; cursor: pointer; transition: color 0.2s; color: #94a3b8; }

@@ -91,15 +91,6 @@
                         <label>Filter Kelas:</label>
                         <select id="filterKelas" class="filter-select">
                             <option value="all">Semua Kelas</option>
-                            <option value="7A">7A</option>
-                            <option value="7B">7B</option>
-                            <option value="7C">7C</option>
-                            <option value="8A">8A</option>
-                            <option value="8B">8B</option>
-                            <option value="8C">8C</option>
-                            <option value="9A">9A</option>
-                            <option value="9B">9B</option>
-                            <option value="9C">9C</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -194,15 +185,6 @@
                             <label>Kelas</label>
                             <select id="kelas" class="form-input" required>
                                 <option value="">Pilih Kelas</option>
-                                <option value="7A">7A</option>
-                                <option value="7B">7B</option>
-                                <option value="7C">7C</option>
-                                <option value="8A">8A</option>
-                                <option value="8B">8B</option>
-                                <option value="8C">8C</option>
-                                <option value="9A">9A</option>
-                                <option value="9B">9B</option>
-                                <option value="9C">9C</option>
                             </select>
                         </div>
                         <div class="form-group">

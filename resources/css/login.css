@@ -4,6 +4,36 @@
    DENGAN ANIMASI SPLASH SCREEN & SLIDE
    ======================================== */
 
+:root {
+    --bg-page: linear-gradient(135deg, #f5f7fa 0%, #ffffff 50%, #f0f4f8 100%);
+    --bg-card: #ffffff;
+    --bg-right: #ffffff;
+    --bg-input: #f8fafc;
+    --bg-input-focus: #ffffff;
+    --bg-selector: #f1f5f9;
+    --bg-btn-active: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --border-color: #e2e8f0;
+    --shadow-card: rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] {
+    --bg-page: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    --bg-card: #1e293b;
+    --bg-right: #1e293b;
+    --bg-input: #0f172a;
+    --bg-input-focus: #162032;
+    --bg-selector: #0f172a;
+    --bg-btn-active: #1e293b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --border-color: #334155;
+    --shadow-card: rgba(0, 0, 0, 0.5);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -12,7 +42,7 @@
 
 body {
     font-family: 'Instrument Sans', sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 50%, #f0f4f8 100%);
+    background: var(--bg-page);
     min-height: 100vh;
     overflow: hidden;
     position: relative;
@@ -132,10 +162,10 @@ body {
     display: flex;
     max-width: 1200px;
     width: 100%;
-    background: white;
+    background: var(--bg-card);
     border-radius: 2rem;
     overflow: hidden;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 25px 50px -12px var(--shadow-card);
     min-height: 600px;
     position: absolute;
     top: 50%;
@@ -144,6 +174,7 @@ body {
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.5s ease, visibility 0.5s ease;
+    border: 1px solid var(--border-color);
 }
 
 .login-container.visible {
@@ -310,7 +341,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    background: white;
+    background: var(--bg-right);
     opacity: 0;
     transform: translateX(30px);
     transition: opacity 0.6s ease 0.3s, transform 0.6s ease 0.3s;
@@ -360,7 +391,7 @@ body {
 
 .login-header p {
     font-size: 0.875rem;
-    color: #64748b;
+    color: var(--text-secondary);
 }
 
 /* Session Status */
@@ -382,7 +413,7 @@ body {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;
-    background: #f1f5f9;
+    background: var(--bg-selector);
     padding: 0.25rem;
     border-radius: 2rem;
 }
@@ -395,7 +426,7 @@ body {
     border-radius: 1.75rem;
     font-size: 0.75rem;
     font-weight: 500;
-    color: #64748b;
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
@@ -405,7 +436,7 @@ body {
 }
 
 .type-btn.active {
-    background: white;
+    background: var(--bg-btn-active);
     color: #2563eb;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
@@ -432,19 +463,20 @@ body {
 .modern-input {
     width: 100%;
     padding: 0.85rem 2.5rem 0.85rem 2.75rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
     border-radius: 1rem;
     font-size: 0.9rem;
     font-family: 'Instrument Sans', sans-serif;
     transition: all 0.3s ease;
-    background: #f8fafc;
+    background: var(--bg-input);
+    color: var(--text-primary);
 }
 
 .modern-input:focus {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    background: white;
+    background: var(--bg-input-focus);
 }
 
 .toggle-password {
@@ -481,7 +513,7 @@ body {
 
 .checkbox-modern span {
     font-size: 0.8rem;
-    color: #475569;
+    color: var(--text-secondary);
 }
 
 .forgot-link {

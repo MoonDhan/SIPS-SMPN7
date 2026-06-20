@@ -16,6 +16,13 @@
     
     <!-- Custom CSS -->
     @vite(['resources/css/login.css'])
+
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
 </head>
 <body>
     <!-- Splash Screen / Opening Animation Container -->

@@ -98,6 +98,10 @@ function renderMainChart() {
     const labels = sorted.map(v => v.nama.length > 15 ? v.nama.slice(0, 14) + '...' : v.nama);
     const values = sorted.map(v => v.frekuensi);
 
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const textColor = isDark ? '#94a3b8' : '#64748b';
+    const gridColor = isDark ? 'rgba(51, 65, 85, 0.5)' : '#e2e8f0';
+
     if (mainChart) mainChart.destroy();
 
     mainChart = new Chart(ctx, {
@@ -124,8 +128,15 @@ function renderMainChart() {
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-                y: { beginAtZero: true, ticks: { stepSize: 1 } },
-                x: { grid: { display: false } },
+                y: { 
+                    beginAtZero: true, 
+                    ticks: { color: textColor, stepSize: 1 },
+                    grid: { color: gridColor }
+                },
+                x: { 
+                    grid: { display: false },
+                    ticks: { color: textColor }
+                },
             },
         },
     });
@@ -138,6 +149,10 @@ function renderPieChart() {
     const ctx = canvas.getContext('2d');
     const { ringan, sedang, berat } = chartData.by_kategori;
 
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const legendColor = isDark ? '#94a3b8' : '#64748b';
+    const donutBorder = isDark ? '#1e293b' : '#ffffff';
+
     if (pieChart) pieChart.destroy();
 
     pieChart = new Chart(ctx, {
@@ -148,13 +163,18 @@ function renderPieChart() {
                 data: [ringan, sedang, berat],
                 backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
                 borderWidth: 3,
-                borderColor: 'white',
+                borderColor: donutBorder,
             }],
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } },
+            plugins: { 
+                legend: { 
+                    position: 'bottom',
+                    labels: { color: legendColor }
+                } 
+            },
             cutout: '65%',
         },
     });
@@ -202,4 +222,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initSidebarToggle();
     initChartButtons();
     initNotifications(); // real-time notification (polling)
+
+    // Re-render charts on theme change
+    window.addEventListener('theme-changed', () => {
+        if (chartData && (chartData.by_jenis || chartData.by_kategori)) {
+            renderCharts();
+        }
+    });
 });

@@ -52,12 +52,20 @@ class SiswaController extends Controller
      */
     public function kelas(): JsonResponse
     {
-        $kelas = Siswa::distinct()
-            ->whereNotNull('kelas')
-            ->orderBy('kelas')
-            ->pluck('kelas');
+        $kelasGuru = \App\Models\GuruKelas::whereNotNull('kelas_wali')
+            ->where('kelas_wali', '!=', '')
+            ->pluck('kelas_wali')
+            ->toArray();
 
-        return response()->json(['data' => $kelas]);
+        $kelasSiswa = Siswa::whereNotNull('kelas')
+            ->where('kelas', '!=', '')
+            ->pluck('kelas')
+            ->toArray();
+
+        $kelas = array_unique(array_merge($kelasGuru, $kelasSiswa));
+        sort($kelas);
+
+        return response()->json(['data' => array_values($kelas)]);
     }
 
     public function store(Request $request): JsonResponse
@@ -75,6 +83,10 @@ class SiswaController extends Controller
 
         $validated['tahun_ajaran'] = '2025/2026';
         $validated['is_active'] = $request->boolean('is_active', true);
+        
+        // Cari wali kelas yang sesuai kelasnya
+        $wali = \App\Models\GuruKelas::where('kelas_wali', $request->kelas)->first();
+        $validated['wali_kelas_id'] = $wali ? $wali->id : null;
 
         $siswa = Siswa::create($validated);
 
@@ -98,6 +110,11 @@ class SiswaController extends Controller
         ]);
 
         $validated['is_active'] = $request->boolean('is_active', true);
+        
+        // Cari wali kelas yang sesuai kelasnya
+        $wali = \App\Models\GuruKelas::where('kelas_wali', $request->kelas)->first();
+        $validated['wali_kelas_id'] = $wali ? $wali->id : null;
+
         $siswa->update($validated);
 
         return response()->json([

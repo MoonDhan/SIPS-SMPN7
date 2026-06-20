@@ -1,3 +1,10 @@
+<script>
+    (function() {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+</script>
+
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
         <div class="brand-icon">
@@ -37,6 +44,14 @@
     </nav>
 
     <div class="sidebar-footer">
+        <div class="theme-toggle-container" style="margin-bottom: 0.75rem;">
+            <button id="themeToggleBtn" class="logout-btn" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.15);">
+                <i class="fas fa-sun" id="themeSunIcon" style="display: none;"></i>
+                <i class="fas fa-moon" id="themeMoonIcon"></i>
+                <span id="themeToggleText">Tema Gelap</span>
+            </button>
+        </div>
+
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="logout-btn">
@@ -57,3 +72,34 @@
         </div>
     </div>
 </aside>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const toggleBtn = document.getElementById('themeToggleBtn');
+        const sunIcon = document.getElementById('themeSunIcon');
+        const moonIcon = document.getElementById('themeMoonIcon');
+        const toggleText = document.getElementById('themeToggleText');
+
+        function updateToggleUI(theme) {
+            if (theme === 'dark') {
+                sunIcon.style.display = 'inline-block';
+                moonIcon.style.display = 'none';
+                toggleText.textContent = 'Tema Terang';
+            } else {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'inline-block';
+                toggleText.textContent = 'Tema Gelap';
+            }
+        }
+
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        updateToggleUI(currentTheme);
+
+        toggleBtn.addEventListener('click', () => {
+            const nowTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', nowTheme);
+            localStorage.setItem('theme', nowTheme);
+            updateToggleUI(nowTheme);
+        });
+    });
+</script>

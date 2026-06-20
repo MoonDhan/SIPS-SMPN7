@@ -429,7 +429,40 @@ async function initNotificationDropdown() {
     });
 }
 
+async function loadKelasOptions() {
+    try {
+        const { data } = await window.axios.get('/api/siswa/kelas');
+        const classes = data.data;
+
+        const filterKelas = document.getElementById('filterKelas');
+        const formKelas = document.getElementById('kelas');
+
+        if (filterKelas) {
+            filterKelas.innerHTML = '<option value="all">Semua Kelas</option>';
+            classes.forEach(cls => {
+                const opt = document.createElement('option');
+                opt.value = cls;
+                opt.textContent = cls;
+                filterKelas.appendChild(opt);
+            });
+        }
+
+        if (formKelas) {
+            formKelas.innerHTML = '<option value="">Pilih Kelas</option>';
+            classes.forEach(cls => {
+                const opt = document.createElement('option');
+                opt.value = cls;
+                opt.textContent = cls;
+                formKelas.appendChild(opt);
+            });
+        }
+    } catch (error) {
+        console.error('Gagal memuat data kelas:', error);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+    await loadKelasOptions();
     await loadStats();
     await loadSiswa();
     initNotifications(); // real-time notification (polling)

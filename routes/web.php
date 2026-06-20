@@ -82,6 +82,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/notifications/today', [DashboardController::class, 'notificationsToday']);
         
         Route::get('/siswa/stats', [SiswaController::class, 'stats']);
+        Route::get('/siswa/kelas', [SiswaController::class, 'kelas']);
         Route::get('/siswa', [SiswaController::class, 'index']);
         Route::post('/siswa', [SiswaController::class, 'store']);
         Route::put('/siswa/{siswa}', [SiswaController::class, 'update']);
