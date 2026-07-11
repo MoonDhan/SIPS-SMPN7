@@ -21,6 +21,7 @@ class Siswa extends Model
         'alamat',
         'wali_kelas_id',
         'is_active',
+        'lulus_dari',
     ];
 
     protected function casts(): array

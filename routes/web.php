@@ -131,6 +131,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/siswa/template', [SiswaController::class, 'template']);
             Route::post('/siswa/import', [SiswaController::class, 'import']);
             Route::post('/siswa/bulk-move', [SiswaController::class, 'bulkMoveClass']);
+            Route::delete('/siswa/lulus/bulk-delete', [SiswaController::class, 'destroyLulus']);
             Route::post('/siswa', [SiswaController::class, 'store']);
             Route::put('/siswa/{siswa}', [SiswaController::class, 'update']);
             Route::delete('/siswa/{siswa}', [SiswaController::class, 'destroy']);

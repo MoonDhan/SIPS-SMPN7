@@ -540,6 +540,11 @@ body {
     color: #991b1b;
 }
 
+.badge-status.lulus {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
 /* Action Buttons */
 .btn-edit,
 .btn-delete {

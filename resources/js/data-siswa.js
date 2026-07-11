@@ -36,12 +36,12 @@ function renderTable() {
             <td><strong>${siswa.nis}</strong></td>
             <td>${siswa.nisn}</td>
             <td>${siswa.nama}</td>
-            <td>${siswa.kelas}</td>
+            <td>${siswa.kelas.toLowerCase() === 'lulus' ? (siswa.lulus_dari || '-') : siswa.kelas}</td>
             <td>${siswa.jk === 'L' ? 'Laki-laki' : 'Perempuan'}</td>
             <td>${siswa.noHp || '-'}</td>
             <td>
-                <span class="badge-status ${siswa.status}">
-                    ${siswa.status === 'aktif' ? 'Aktif' : 'Tidak Aktif'}
+                <span class="badge-status ${siswa.kelas.toLowerCase() === 'lulus' ? 'lulus' : siswa.status}">
+                    ${siswa.kelas.toLowerCase() === 'lulus' ? 'Lulus' : (siswa.status === 'aktif' ? 'Aktif' : 'Tidak Aktif')}
                 </span>
             </td>
             <td>
@@ -102,6 +102,16 @@ async function loadSiswa() {
         filteredData = [...siswaData];
         currentPage = 1;
         renderTable();
+
+        // Tampilkan tombol Hapus Lulus hanya jika filter kelas adalah Lulus
+        const btnHapusLulus = document.getElementById('btnHapusLulus');
+        if (btnHapusLulus) {
+            if (kelas && kelas.toLowerCase() === 'lulus') {
+                btnHapusLulus.style.display = 'inline-block';
+            } else {
+                btnHapusLulus.style.display = 'none';
+            }
+        }
     } catch (error) {
         console.error('Gagal memuat data siswa:', error);
         showToast('Gagal memuat data siswa', 'error');
@@ -150,6 +160,55 @@ window.editSiswa = function (id) {
     document.getElementById('nis').value = siswa.nis;
     document.getElementById('nisn').value = siswa.nisn;
     document.getElementById('nama').value = siswa.nama;
+    
+    // Filter opsi kelas berdasarkan kelas siswa saat ini
+    const asal = siswa.kelas || '';
+    const opts = document.querySelectorAll('#kelas option');
+    opts.forEach(opt => {
+        if (opt.value === '') {
+            opt.style.display = 'block';
+            opt.disabled = false;
+            return;
+        }
+        
+        if (asal.startsWith('7')) {
+            if (opt.value.startsWith('7') || opt.value.startsWith('8')) {
+                opt.style.display = 'block';
+                opt.disabled = false;
+            } else {
+                opt.style.display = 'none';
+                opt.disabled = true;
+            }
+        } else if (asal.startsWith('8')) {
+            if (opt.value.startsWith('7') || opt.value.startsWith('8') || opt.value.startsWith('9')) {
+                opt.style.display = 'block';
+                opt.disabled = false;
+            } else {
+                opt.style.display = 'none';
+                opt.disabled = true;
+            }
+        } else if (asal.startsWith('9')) {
+            if (opt.value.startsWith('8') || opt.value.startsWith('9') || opt.value.toLowerCase() === 'lulus') {
+                opt.style.display = 'block';
+                opt.disabled = false;
+            } else {
+                opt.style.display = 'none';
+                opt.disabled = true;
+            }
+        } else if (asal.toLowerCase() === 'lulus') {
+            if (opt.value.toLowerCase() === 'lulus' || opt.value.startsWith('9')) {
+                opt.style.display = 'block';
+                opt.disabled = false;
+            } else {
+                opt.style.display = 'none';
+                opt.disabled = true;
+            }
+        } else {
+            opt.style.display = 'block';
+            opt.disabled = false;
+        }
+    });
+
     document.getElementById('kelas').value = siswa.kelas;
     document.getElementById('jenisKelamin').value = siswa.jk;
     document.getElementById('noHp').value = siswa.noHp || '';
@@ -249,6 +308,14 @@ document.getElementById('searchSiswa').addEventListener('input', debounce(loadSi
 document.getElementById('btnTambahSiswa').addEventListener('click', () => {
     document.getElementById('modalTitle').textContent = 'Tambah Siswa';
     document.getElementById('editId').value = '';
+    
+    // Tampilkan kembali semua opsi kelas untuk form Tambah
+    const opts = document.querySelectorAll('#kelas option');
+    opts.forEach(opt => {
+        opt.style.display = 'block';
+        opt.disabled = false;
+    });
+
     document.getElementById('formSiswa').reset();
     document.getElementById('status').value = 'aktif';
     document.getElementById('modalSiswa').classList.add('show');
@@ -329,6 +396,63 @@ if (btnNaikKelas) {
         }
     });
 
+    document.getElementById('kelasAsal').addEventListener('change', (e) => {
+        const asal = e.target.value;
+        const opts = document.querySelectorAll('#kelasTujuan option');
+        
+        document.getElementById('kelasTujuan').value = ''; // Reset pilihan tujuan
+        
+        opts.forEach(opt => {
+            if (opt.value === '') {
+                opt.style.display = 'block';
+                opt.disabled = false;
+                return;
+            }
+
+            if (asal.startsWith('7')) {
+                // Kelas 7 hanya bisa ke kelas 8
+                if (opt.value.startsWith('8')) {
+                    opt.style.display = 'block';
+                    opt.disabled = false;
+                } else {
+                    opt.style.display = 'none';
+                    opt.disabled = true;
+                }
+            } else if (asal.startsWith('8')) {
+                // Kelas 8 hanya bisa ke kelas 9
+                if (opt.value.startsWith('9')) {
+                    opt.style.display = 'block';
+                    opt.disabled = false;
+                } else {
+                    opt.style.display = 'none';
+                    opt.disabled = true;
+                }
+            } else if (asal.startsWith('9')) {
+                // Kelas 9 hanya bisa ke Lulus
+                if (opt.value.toLowerCase() === 'lulus') {
+                    opt.style.display = 'block';
+                    opt.disabled = false;
+                } else {
+                    opt.style.display = 'none';
+                    opt.disabled = true;
+                }
+            } else if (asal.toLowerCase() === 'lulus') {
+                // Lulus bisa diturunkan kembali ke kelas 9 (pembatalan lulus)
+                if (opt.value.startsWith('9')) {
+                    opt.style.display = 'block';
+                    opt.disabled = false;
+                } else {
+                    opt.style.display = 'none';
+                    opt.disabled = true;
+                }
+            } else {
+                // Jika belum pilih kelas asal
+                opt.style.display = 'none';
+                opt.disabled = true;
+            }
+        });
+    });
+
     document.getElementById('modalNaikKelasSave').addEventListener('click', async () => {
         const kelasAsal = document.getElementById('kelasAsal').value;
         const kelasTujuan = document.getElementById('kelasTujuan').value.trim();
@@ -385,6 +509,49 @@ if (btnNaikKelas) {
                     const btn = document.getElementById('modalNaikKelasSave');
                     btn.disabled = false;
                     btn.textContent = 'Proses Pindah';
+                }
+            }
+        });
+    });
+}
+
+// Fitur Hapus Lulus Massal
+const btnHapusLulus = document.getElementById('btnHapusLulus');
+if (btnHapusLulus) {
+    btnHapusLulus.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const bgColor = isDark ? '#1e293b' : '#ffffff';
+        const textColor = isDark ? '#f8fafc' : '#1e293b';
+
+        Swal.fire({
+            title: 'Konfirmasi Hapus Lulus',
+            html: `Apakah Anda yakin ingin menghapus <strong>SEMUA</strong> siswa yang berstatus <strong>Lulus</strong>?<br><br><small style="color: #ef4444;">Aksi ini tidak dapat dibatalkan!</small>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Ya, Hapus Semua!',
+            cancelButtonText: 'Batal',
+            background: bgColor,
+            color: textColor
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await window.axios.delete('/api/siswa/lulus/bulk-delete');
+                    showToast(response.data.message || 'Siswa lulus berhasil dihapus', 'success');
+                    await loadKelasOptions();
+                    await loadSiswa();
+                    await loadStats();
+                } catch (error) {
+                    const message = error.response?.data?.message || 'Gagal menghapus siswa lulus';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Menghapus',
+                        text: message,
+                        background: bgColor,
+                        color: textColor,
+                        confirmButtonColor: '#ef4444'
+                    });
                 }
             }
         });
@@ -662,18 +829,30 @@ async function loadKelasOptions() {
                 opt.textContent = cls;
                 formKelas.appendChild(opt);
             });
+            // Pastikan opsi Lulus selalu ada
+            if (!classes.find(c => c.toLowerCase() === 'lulus')) {
+                const optLulus = document.createElement('option');
+                optLulus.value = 'Lulus';
+                optLulus.textContent = 'Lulus';
+                formKelas.appendChild(optLulus);
+            }
         }
         
         if (formKelasAsal) {
             formKelasAsal.innerHTML = '<option value="">Pilih Kelas Asal</option>';
             classes.forEach(cls => {
-                if (cls.toLowerCase() !== 'lulus') {
-                    const opt = document.createElement('option');
-                    opt.value = cls;
-                    opt.textContent = cls;
-                    formKelasAsal.appendChild(opt);
-                }
+                const opt = document.createElement('option');
+                opt.value = cls;
+                opt.textContent = cls;
+                formKelasAsal.appendChild(opt);
             });
+            // Pastikan opsi Lulus selalu ada
+            if (!classes.find(c => c.toLowerCase() === 'lulus')) {
+                const optLulus = document.createElement('option');
+                optLulus.value = 'Lulus';
+                optLulus.textContent = 'Lulus';
+                formKelasAsal.appendChild(optLulus);
+            }
         }
 
         if (formKelasTujuan) {
@@ -682,8 +861,26 @@ async function loadKelasOptions() {
                 const opt = document.createElement('option');
                 opt.value = cls;
                 opt.textContent = cls;
+                if (cls.toLowerCase() === 'lulus') {
+                    opt.style.display = 'none';
+                    opt.disabled = true;
+                }
                 formKelasTujuan.appendChild(opt);
             });
+            // Pastikan opsi Lulus selalu ada
+            if (!classes.find(c => c.toLowerCase() === 'lulus')) {
+                const optLulus = document.createElement('option');
+                optLulus.value = 'Lulus';
+                optLulus.textContent = 'Lulus';
+                optLulus.style.display = 'none';
+                optLulus.disabled = true;
+                formKelasTujuan.appendChild(optLulus);
+            }
+        }
+        
+        // Trigger event change agar opsi kelasTujuan langsung difilter/disembunyikan sesuai default (kosong)
+        if (formKelasAsal) {
+            formKelasAsal.dispatchEvent(new Event('change'));
         }
     } catch (error) {
         console.error('Gagal memuat data kelas:', error);

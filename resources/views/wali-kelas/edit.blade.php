@@ -57,7 +57,9 @@
                                 <select class="form-control" id="kelas_wali" name="kelas_wali" required>
                                     <option value="">-- Pilih Kelas --</option>
                                     @foreach($list_kelas as $kelas)
+                                        @if(strtolower($kelas->nama) !== 'lulus')
                                         <option value="{{ $kelas->nama }}" {{ old('kelas_wali', $wali->kelas_wali) == $kelas->nama ? 'selected' : '' }}>{{ $kelas->nama }}</option>
+                                        @endif
                                     @endforeach
                                 </select>
                                 @error('kelas_wali') <span class="text-danger">{{ $message }}</span> @enderror

@@ -135,6 +135,16 @@ class SiswaController extends Controller
 
         $validated['is_active'] = $request->boolean('is_active', true);
         
+        // Cek jika kelas diubah ke Lulus
+        $isLulus = strtolower($request->kelas) === 'lulus';
+        if ($isLulus) {
+            if (strtolower($siswa->kelasRelation?->nama ?? '') !== 'lulus') {
+                $validated['lulus_dari'] = $siswa->kelasRelation?->nama;
+            }
+        } else {
+            $validated['lulus_dari'] = null;
+        }
+
         // Cari wali kelas yang sesuai kelasnya
         $wali = \App\Models\WaliKelas::where('kelas_wali', $request->kelas)->first();
         $validated['wali_kelas_id'] = $wali ? $wali->id : null;
@@ -158,6 +168,27 @@ class SiswaController extends Controller
         return response()->json(['message' => 'Data siswa berhasil dihapus']);
     }
 
+    public function destroyLulus(): JsonResponse
+    {
+        if (!auth()->user()->isAdminBK() && !auth()->user()->isGuruBK()) {
+            return response()->json(['message' => 'Aksi tidak diizinkan untuk peran Anda.'], 403);
+        }
+
+        $lulusKelas = \App\Models\Kelas::where('nama', 'Lulus')->first();
+        if (!$lulusKelas) {
+            return response()->json(['message' => 'Tidak ada data kelas Lulus.'], 404);
+        }
+
+        $count = Siswa::where('class_id', $lulusKelas->id)->count();
+        if ($count === 0) {
+            return response()->json(['message' => 'Tidak ada siswa yang berstatus Lulus untuk dihapus.'], 404);
+        }
+
+        Siswa::where('class_id', $lulusKelas->id)->delete();
+
+        return response()->json(['message' => "Berhasil menghapus $count data siswa yang sudah lulus."]);
+    }
+
     public function bulkMoveClass(Request $request): JsonResponse
     {
         if (!auth()->user()->isAdminBK() && !auth()->user()->isGuruBK()) {
@@ -177,9 +208,9 @@ class SiswaController extends Controller
         
         $kelasTujuan = \App\Models\Kelas::firstOrCreate(['nama' => $request->kelas_tujuan]);
         
-        // Cek apakah kelas tujuan sudah memiliki siswa (mencegah tercampur)
+        // Cek apakah kelas tujuan sudah memiliki siswa (mencegah tercampur) kecuali jika tujuannya Lulus
         $jumlahSiswaTujuan = Siswa::where('class_id', $kelasTujuan->id)->count();
-        if ($jumlahSiswaTujuan > 0) {
+        if (strtolower($request->kelas_tujuan) !== 'lulus' && $jumlahSiswaTujuan > 0) {
             return response()->json([
                 'message' => 'Gagal! Kelas tujuan (' . $request->kelas_tujuan . ') masih berisi ' . $jumlahSiswaTujuan . ' siswa. Silakan pindahkan/luluskan siswa di kelas ' . $request->kelas_tujuan . ' terlebih dahulu.'
             ], 422);
@@ -187,9 +218,12 @@ class SiswaController extends Controller
 
         $waliTujuan = \App\Models\WaliKelas::where('kelas_wali', $request->kelas_tujuan)->first();
         
+        $isLulus = strtolower($request->kelas_tujuan) === 'lulus';
+        
         Siswa::where('class_id', $kelasAsal->id)->update([
             'class_id' => $kelasTujuan->id,
             'wali_kelas_id' => $waliTujuan ? $waliTujuan->id : null,
+            'lulus_dari' => $isLulus ? $request->kelas_asal : null,
         ]);
         
         return response()->json([
@@ -200,11 +234,19 @@ class SiswaController extends Controller
     public function export(Request $request)
     {
         $query = Siswa::with('kelasRelation');
+        $isSpecificClass = $request->filled('kelas') && $request->kelas !== 'all';
+        $kelasName = '';
+        $waliName = '-';
 
-        if ($request->filled('kelas') && $request->kelas !== 'all') {
-            $query->whereHas('kelasRelation', function($q) use ($request) {
-                $q->where('nama', $request->kelas);
+        if ($isSpecificClass) {
+            $kelasName = $request->kelas;
+            $query->whereHas('kelasRelation', function($q) use ($kelasName) {
+                $q->where('nama', $kelasName);
             });
+            $wali = \App\Models\WaliKelas::where('kelas_wali', $kelasName)->first();
+            if ($wali) {
+                $waliName = $wali->nama_lengkap;
+            }
         }
 
         if ($request->filled('status') && $request->status !== 'all') {
@@ -226,21 +268,49 @@ class SiswaController extends Controller
                         ->select('siswa.*')
                         ->get();
 
-        $data = [
-            ['NIS', 'NISN', 'Nama Lengkap', 'Kelas', 'L/P', 'No HP', 'Alamat', 'Status']
-        ];
+        $data = [];
 
-        foreach ($siswas as $siswa) {
-            $data[] = [
-                $siswa->nis,
-                $siswa->nisn,
-                $siswa->nama_lengkap,
-                $siswa->kelasRelation ? $siswa->kelasRelation->nama : '-',
-                $siswa->jenis_kelamin,
-                $siswa->no_hp,
-                $siswa->alamat,
-                $siswa->is_active ? 'Aktif' : 'Nonaktif'
-            ];
+        if ($isSpecificClass) {
+            $data[] = ['KELAS', ': ' . $kelasName];
+            $data[] = ['WALI KELAS', ': ' . $waliName];
+            $data[] = ['']; // Empty row
+            $data[] = ['NO', 'NIS', 'NISN', 'NAMA SISWA', 'L/P', 'NO HP', 'ALAMAT', 'STATUS'];
+            
+            $no = 1;
+            foreach ($siswas as $siswa) {
+                $statusStr = $siswa->kelasRelation && strtolower($siswa->kelasRelation->nama) === 'lulus' ? 'Lulus' : ($siswa->is_active ? 'Aktif' : 'Nonaktif');
+                $data[] = [
+                    $no++,
+                    $siswa->nis,
+                    $siswa->nisn,
+                    $siswa->nama_lengkap,
+                    $siswa->jenis_kelamin,
+                    $siswa->no_hp,
+                    $siswa->alamat,
+                    $statusStr
+                ];
+            }
+        } else {
+            $data[] = ['NO', 'NIS', 'NISN', 'NAMA SISWA', 'KELAS', 'L/P', 'NO HP', 'ALAMAT', 'STATUS'];
+            
+            $no = 1;
+            foreach ($siswas as $siswa) {
+                $isLulus = $siswa->kelasRelation && strtolower($siswa->kelasRelation->nama) === 'lulus';
+                $kelasStr = $isLulus ? ($siswa->lulus_dari ?: 'Lulus') : ($siswa->kelasRelation ? $siswa->kelasRelation->nama : '-');
+                $statusStr = $isLulus ? 'Lulus' : ($siswa->is_active ? 'Aktif' : 'Nonaktif');
+                
+                $data[] = [
+                    $no++,
+                    $siswa->nis,
+                    $siswa->nisn,
+                    $siswa->nama_lengkap,
+                    $kelasStr,
+                    $siswa->jenis_kelamin,
+                    $siswa->no_hp,
+                    $siswa->alamat,
+                    $statusStr
+                ];
+            }
         }
 
         $xlsx = \Shuchkin\SimpleXLSXGen::fromArray($data);
@@ -385,6 +455,7 @@ class SiswaController extends Controller
             'nisn' => $siswa->nisn,
             'nama' => $siswa->nama_lengkap,
             'kelas' => $siswa->kelasRelation ? $siswa->kelasRelation->nama : '-',
+            'lulus_dari' => $siswa->lulus_dari,
             'jk' => $siswa->jenis_kelamin,
             'noHp' => $siswa->no_hp,
             'alamat' => $siswa->alamat,

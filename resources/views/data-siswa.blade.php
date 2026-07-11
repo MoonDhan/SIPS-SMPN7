@@ -114,6 +114,9 @@
                     <button class="btn-export" id="btnNaikKelas" style="background-color: #f59e0b; color: white; border: none; margin-right: 0.5rem;">
                         <i class="fas fa-level-up-alt"></i> Naik/Pindah Kelas
                     </button>
+                    <button class="btn-export" id="btnHapusLulus" style="display: none; background-color: #ef4444; color: white; border: none; margin-right: 0.5rem;">
+                        <i class="fas fa-user-slash"></i> Hapus Lulus
+                    </button>
                     <button class="btn-export" id="btnImport" style="background-color: #10b981; color: white; border: none; margin-right: 0.5rem;">
                         <i class="fas fa-file-excel"></i> Import Excel
                     </button>
