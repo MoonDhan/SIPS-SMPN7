@@ -81,7 +81,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="role">Peran / Hak Akses <span class="text-danger" style="display:inline;">*</span></label>
-                                <select class="form-control" id="role" name="role" required onchange="toggleKelasField()">
+                                <select class="form-control" id="role" name="role" required>
                                     <option value="admin_bk" {{ old('role', $guru->role) == 'admin_bk' ? 'selected' : '' }}>Admin BK (Administrator)</option>
                                     <option value="guru_bk" {{ old('role', $guru->role) == 'guru_bk' ? 'selected' : '' }}>Guru BK</option>
 
@@ -91,20 +91,7 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6" id="kelasField" style="display: none;">
-                            <div class="form-group">
-                                <label for="class_id">Kelas Diampu <span class="text-danger" style="display:inline;">*</span></label>
-                                <select class="form-control" id="class_id" name="class_id">
-                                    <option value="">Pilih Kelas</option>
-                                    @foreach($list_kelas as $kelas)
-                                        <option value="{{ $kelas->id }}" {{ old('class_id', $guru->class_id) == $kelas->id ? 'selected' : '' }}>{{ $kelas->nama }}</option>
-                                    @endforeach
-                                </select>
-                                @error('class_id') <span class="text-danger">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-                    </div>
+
 
                     <div class="password-box">
                         <h4><i class="fas fa-key"></i> Ubah Password <small class="text-muted" style="font-weight: normal;">(Kosongkan jika tidak ingin diubah)</small></h4>

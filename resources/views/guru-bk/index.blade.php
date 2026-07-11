@@ -43,15 +43,27 @@
                 </div>
 
                 @if(session('success'))
-                    <div class="alert alert-success">
+                    <div class="alert alert-success" id="alertSuccess" style="transition: opacity 0.5s ease;">
                         <i class="fas fa-check-circle"></i> {{ session('success') }}
                     </div>
+                    <script>
+                        setTimeout(() => {
+                            const el = document.getElementById('alertSuccess');
+                            if (el) { el.style.opacity = '0'; setTimeout(() => el.remove(), 500); }
+                        }, 3000);
+                    </script>
                 @endif
 
                 @if(session('error'))
-                    <div class="alert alert-error">
+                    <div class="alert alert-error" id="alertError" style="transition: opacity 0.5s ease;">
                         <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
                     </div>
+                    <script>
+                        setTimeout(() => {
+                            const el = document.getElementById('alertError');
+                            if (el) { el.style.opacity = '0'; setTimeout(() => el.remove(), 500); }
+                        }, 3000);
+                    </script>
                 @endif
 
                 <div class="recent-table-wrapper">

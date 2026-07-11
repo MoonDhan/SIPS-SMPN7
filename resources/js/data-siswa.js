@@ -243,16 +243,7 @@ window.deleteSiswa = function (id) {
             try {
                 await window.axios.delete(`/api/siswa/${id}`);
                 
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: 'Data siswa berhasil dihapus',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    background: bgColor,
-                    color: textColor
-                });
+                showToast('Data siswa berhasil dihapus', 'success');
 
                 await loadSiswa();
                 await loadStats();

@@ -58,9 +58,18 @@
                 <!-- Settings Formss (Right Content) -->
                 <div class="settings-content">
                     @if(session('success'))
-                        <div class="alert alert-success">
+                        <div class="alert alert-success" id="alertSuccess" style="transition: opacity 0.5s ease;">
                             <i class="fas fa-check-circle"></i> {{ session('success') }}
                         </div>
+                        <script>
+                            setTimeout(() => {
+                                const alert = document.getElementById('alertSuccess');
+                                if (alert) {
+                                    alert.style.opacity = '0';
+                                    setTimeout(() => alert.remove(), 500);
+                                }
+                            }, 3000);
+                        </script>
                     @endif
 
                     <!-- Tab 1: Profil Saya -->
