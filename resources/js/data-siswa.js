@@ -161,37 +161,57 @@ window.editSiswa = function (id) {
 let currentDeleteId = null;
 
 window.deleteSiswa = function (id) {
-    currentDeleteId = id;
-    document.getElementById('modalHapus').classList.add('show');
+    const siswa = siswaData.find(s => s.id === id);
+    const siswaName = siswa ? siswa.nama : 'siswa ini';
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const bgColor = isDark ? '#1e293b' : '#ffffff';
+    const textColor = isDark ? '#f8fafc' : '#1e293b';
+
+    Swal.fire({
+        title: 'Hapus Data Siswa?',
+        html: `Apakah Anda yakin ingin menghapus data siswa <strong>${siswaName}</strong>?<br><span style="color: #ef4444; font-size: 0.875rem;">Tindakan ini tidak dapat dibatalkan!</span>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal',
+        background: bgColor,
+        color: textColor,
+        iconColor: '#ef4444'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                await window.axios.delete(`/api/siswa/${id}`);
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Data siswa berhasil dihapus',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: bgColor,
+                    color: textColor
+                });
+
+                await loadSiswa();
+                await loadStats();
+            } catch (error) {
+                const message = error.response?.data?.message || 'Gagal menghapus data siswa';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: message,
+                    showConfirmButton: true,
+                    confirmButtonColor: '#ef4444',
+                    background: bgColor,
+                    color: textColor
+                });
+            }
+        }
+    });
 };
-
-document.getElementById('modalHapusCancel').addEventListener('click', () => {
-    document.getElementById('modalHapus').classList.remove('show');
-    currentDeleteId = null;
-});
-
-document.getElementById('modalHapusConfirm').addEventListener('click', async () => {
-    if (!currentDeleteId) return;
-    
-    document.getElementById('modalHapus').classList.remove('show');
-    try {
-        await window.axios.delete(`/api/siswa/${currentDeleteId}`);
-        showToast('Data siswa berhasil dihapus', 'success');
-        await loadSiswa();
-        await loadStats();
-    } catch (error) {
-        showToast(error.response?.data?.message || 'Gagal menghapus data siswa', 'error');
-    } finally {
-        currentDeleteId = null;
-    }
-});
-
-document.getElementById('modalHapus').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) {
-        document.getElementById('modalHapus').classList.remove('show');
-        currentDeleteId = null;
-    }
-});
 
 function showToast(message, type = 'success') {
     const toast = document.createElement('div');

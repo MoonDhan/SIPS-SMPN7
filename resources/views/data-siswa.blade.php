@@ -12,6 +12,7 @@
     
     <!-- Vite Assets -->
     @vite(['resources/css/data-siswa.css', 'resources/js/data-siswa.js'])
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         window.userCanCRUD = {{ (auth()->user()->isAdminBK() || auth()->user()->isGuruBK()) ? 'true' : 'false' }};
     </script>
@@ -263,25 +264,6 @@
         </div>
     </div>
     
-    <!-- Modal Hapus -->
-    <div class="modal" id="modalHapus">
-        <div class="modal-content" style="max-width: 400px; text-align: center;">
-            <div class="modal-header" style="justify-content: center; border-bottom: none; padding-bottom: 0;">
-                <div style="background-color: #fee2e2; color: #ef4444; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto;">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-            </div>
-            <div class="modal-body" style="padding-top: 15px;">
-                <h3 style="margin-bottom: 10px; color: #1e293b;">Hapus Data Siswa</h3>
-                <p style="font-size: 14px; color: #64748b; margin-bottom: 5px;">Apakah Anda yakin ingin menghapus data siswa ini?</p>
-                <p style="font-size: 13px; color: #ef4444;">Tindakan ini tidak dapat dibatalkan!</p>
-            </div>
-            <div class="modal-footer" style="justify-content: center; border-top: none;">
-                <button class="btn-cancel" id="modalHapusCancel">Batal</button>
-                <button class="btn-save" id="modalHapusConfirm" style="background-color: #ef4444;">Ya, Hapus</button>
-            </div>
-        </div>
-    </div>
     <!-- Modal Import Excel -->
     <div class="modal" id="modalImport">
         <div class="modal-content" style="max-width: 400px;">

@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     @vite(['resources/css/dashboard.css', 'resources/js/guru-bk.js'])
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -104,10 +105,10 @@
                                     </a>
                                     
                                     @if(auth()->id() !== $guru->id)
-                                    <form action="{{ route('guru-bk.destroy', $guru->id) }}" method="POST" style="display: inline;">
+                                    <form action="{{ route('guru-bk.destroy', $guru->id) }}" method="POST" style="display: inline;" class="delete-form">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="btn-action btn-delete" onclick="return confirm('Apakah Anda yakin ingin menghapus akun Guru BK ini? Tindakan ini tidak dapat dibatalkan.')" title="Hapus Guru BK">
+                                        <button type="button" class="btn-action btn-delete btn-delete-user" data-name="{{ $guru->name }}" title="Hapus Guru BK">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
@@ -129,5 +130,66 @@
             </section>
         </main>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toast / Session alerts
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const bgColor = isDark ? '#1e293b' : '#ffffff';
+            const textColor = isDark ? '#f8fafc' : '#1e293b';
+
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: "{{ session('success') }}",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: bgColor,
+                    color: textColor
+                });
+            @endif
+
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: "{{ session('error') }}",
+                    showConfirmButton: true,
+                    confirmButtonColor: '#ef4444',
+                    background: bgColor,
+                    color: textColor
+                });
+            @endif
+
+            // Delete Confirmations
+            const deleteButtons = document.querySelectorAll('.btn-delete-user');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const form = this.closest('form');
+                    const userName = this.getAttribute('data-name');
+
+                    Swal.fire({
+                        title: 'Hapus Pengguna?',
+                        html: `Apakah Anda yakin ingin menghapus akun <strong>${userName}</strong>?<br><span style="color: #ef4444; font-size: 0.875rem;">Tindakan ini tidak dapat dibatalkan!</span>`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Ya, Hapus!',
+                        cancelButtonText: 'Batal',
+                        background: bgColor,
+                        color: textColor,
+                        iconColor: '#ef4444'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     @vite(['resources/css/dashboard.css', 'resources/js/pelanggaran.js'])
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -86,10 +87,10 @@
                                     <a href="{{ route('pelanggaran.edit', $item->id ?? 1) }}" class="btn-action btn-edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="{{ route('pelanggaran.destroy', $item->id ?? 1) }}" method="POST" style="display: inline;">
+                                    <form action="{{ route('pelanggaran.destroy', $item->id ?? 1) }}" method="POST" style="display: inline;" class="delete-form">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="button" class="btn-action btn-delete" onclick="confirmDelete(this.closest('form'))">
+                                        <button type="button" class="btn-action btn-delete btn-delete-pelanggaran" data-siswa="{{ $item->siswa->nama_lengkap ?? 'Siswa' }}" data-pelanggaran="{{ $item->jenis_pelanggaran ?? 'Pelanggaran' }}" title="Hapus Pelanggaran">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
@@ -112,50 +113,66 @@
         </main>
     </div>
 
-    <!-- Modal Hapus -->
-    <div class="modal" id="modalHapus">
-        <div class="modal-content" style="max-width: 400px; text-align: center;">
-            <div class="modal-header" style="justify-content: center; border-bottom: none; padding-bottom: 0;">
-                <div style="background-color: #fee2e2; color: #ef4444; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto;">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-            </div>
-            <div class="modal-body" style="padding-top: 15px;">
-                <h3 style="margin-bottom: 10px; color: #1e293b;">Hapus Catatan Pelanggaran</h3>
-                <p style="font-size: 14px; color: #64748b; margin-bottom: 5px;">Apakah Anda yakin ingin menghapus catatan pelanggaran ini?</p>
-                <p style="font-size: 13px; color: #ef4444;">Tindakan ini tidak dapat dibatalkan!</p>
-            </div>
-            <div class="modal-footer" style="justify-content: center; border-top: none;">
-                <button class="btn-cancel" id="modalHapusCancel">Batal</button>
-                <button class="btn-save" id="modalHapusConfirm" style="background-color: #ef4444;">Ya, Hapus</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        let formToDelete = null;
-        
-        function confirmDelete(form) {
-            formToDelete = form;
-            document.getElementById('modalHapus').classList.add('show');
-        }
-        
-        document.getElementById('modalHapusCancel').addEventListener('click', () => {
-            document.getElementById('modalHapus').classList.remove('show');
-            formToDelete = null;
-        });
-        
-        document.getElementById('modalHapusConfirm').addEventListener('click', () => {
-            if (formToDelete) {
-                formToDelete.submit();
-            }
-        });
-        
-        document.getElementById('modalHapus').addEventListener('click', (e) => {
-            if (e.target === e.currentTarget) {
-                document.getElementById('modalHapus').classList.remove('show');
-                formToDelete = null;
-            }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toast / Session alerts
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const bgColor = isDark ? '#1e293b' : '#ffffff';
+            const textColor = isDark ? '#f8fafc' : '#1e293b';
+
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: "{{ session('success') }}",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: bgColor,
+                    color: textColor
+                });
+            @endif
+
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: "{{ session('error') }}",
+                    showConfirmButton: true,
+                    confirmButtonColor: '#ef4444',
+                    background: bgColor,
+                    color: textColor
+                });
+            @endif
+
+            // Delete Confirmations
+            const deleteButtons = document.querySelectorAll('.btn-delete-pelanggaran');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const form = this.closest('form');
+                    const siswaName = this.getAttribute('data-siswa');
+                    const pelanggaranType = this.getAttribute('data-pelanggaran');
+
+                    Swal.fire({
+                        title: 'Hapus Catatan Pelanggaran?',
+                        html: `Apakah Anda yakin ingin menghapus catatan pelanggaran <strong>${pelanggaranType}</strong> oleh <strong>${siswaName}</strong>?<br><span style="color: #ef4444; font-size: 0.875rem;">Tindakan ini tidak dapat dibatalkan!</span>`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Ya, Hapus!',
+                        cancelButtonText: 'Batal',
+                        background: bgColor,
+                        color: textColor,
+                        iconColor: '#ef4444'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
         });
     </script>
 </body>
