@@ -76,8 +76,25 @@ function updatePagination() {
     document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
 
     let pageNumbers = '';
-    for (let i = 1; i <= totalPages; i++) {
-        pageNumbers += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+    let pages = [];
+    if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+        if (currentPage <= 4) {
+            pages = [1, 2, 3, 4, 5, '...', totalPages];
+        } else if (currentPage >= totalPages - 3) {
+            pages = [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+        } else {
+            pages = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+        }
+    }
+
+    for (let i of pages) {
+        if (i === '...') {
+            pageNumbers += `<span style="padding: 0.25rem 0.5rem; color: #64748b; display: inline-flex; align-items: center; justify-content: center;">...</span>`;
+        } else {
+            pageNumbers += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+        }
     }
     document.getElementById('pageNumbers').innerHTML = pageNumbers || '<span style="color:#94a3b8;font-size:0.75rem;">Tidak ada data</span>';
 }
