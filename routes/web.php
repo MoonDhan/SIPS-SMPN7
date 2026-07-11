@@ -123,10 +123,14 @@ Route::middleware('auth')->group(function () {
         
         Route::get('/siswa/stats', [SiswaController::class, 'stats']);
         Route::get('/siswa/kelas', [SiswaController::class, 'kelas']);
+        Route::get('/siswa/export', [SiswaController::class, 'export']);
         Route::get('/siswa', [SiswaController::class, 'index']);
 
         // Write API only for Admin BK and Guru BK
         Route::middleware('role:admin_bk,guru_bk')->group(function () {
+            Route::get('/siswa/template', [SiswaController::class, 'template']);
+            Route::post('/siswa/import', [SiswaController::class, 'import']);
+            Route::post('/siswa/bulk-move', [SiswaController::class, 'bulkMoveClass']);
             Route::post('/siswa', [SiswaController::class, 'store']);
             Route::put('/siswa/{siswa}', [SiswaController::class, 'update']);
             Route::delete('/siswa/{siswa}', [SiswaController::class, 'destroy']);

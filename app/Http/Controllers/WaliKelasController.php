@@ -10,7 +10,7 @@ class WaliKelasController extends Controller
 {
     public function index()
     {
-        $wali_kelas = WaliKelas::latest()->get();
+        $wali_kelas = WaliKelas::orderBy('kelas_wali', 'asc')->get();
         return view('wali-kelas.index', compact('wali_kelas'));
     }
 

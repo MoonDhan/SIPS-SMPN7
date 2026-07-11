@@ -34,16 +34,52 @@
             </header>
 
             <!-- Kop Surat (Hanya Tampil saat Cetak) -->
+            <style>
+                .print-header, .print-title { display: none; }
+                @media print {
+                    @page {
+                        margin: 0;
+                    }
+                    body {
+                        padding: 1cm 1.5cm; /* Memberikan ruang di sekitar kertas */
+                    }
+                    .print-header {
+                        display: flex !important;
+                        align-items: center;
+                        justify-content: space-between;
+                        border-bottom: 5px solid black;
+                        padding-bottom: 10px;
+                        margin-bottom: 20px;
+                    }
+                    .print-header h1, .print-header h2, .print-header p {
+                        color: black !important;
+                    }
+                    .print-title {
+                        display: block !important;
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }
+                }
+            </style>
             <div class="print-header">
-                <h1>Sistem Informasi Pelanggaran Siswa (SIPS)</h1>
-                <h2>SMP Negeri 7 Jember</h2>
-                <p>Jl. PB Sudirman No. 24, Patrang, Jember, Jawa Timur | Telp: (0331) 487007</p>
-                <h3 style="margin-top: 20px; font-size: 14px; text-decoration: underline; text-transform: uppercase;">Laporan Rekapitulasi Pelanggaran Siswa</h3>
-                <p style="font-size: 11px;">
-                    Periode: {{ \Carbon\Carbon::parse($tanggal_mulai)->format('d/m/Y') }} s/d {{ \Carbon\Carbon::parse($tanggal_selesai)->format('d/m/Y') }}
-                    @if($kelas_selected) | Kelas: {{ $kelas_selected }} @endif
-                    @if($kategori_selected) | Kategori: {{ ucfirst($kategori_selected) }} @endif
-                    @if($search) | Pencarian: "{{ $search }}" @endif
+                <img src="{{ asset('images/logo-baru.png') }}" style="width: 100px; height: auto;" alt="Logo SMP 7">
+                <div style="flex: 1; text-align: center; padding: 0 15px;">
+                    <h1 style="margin: 0; font-size: 26px; font-weight: bold; text-transform: uppercase; font-family: 'Times New Roman', serif;">SMP NEGERI 7 JEMBER</h1>
+                    <h2 style="margin: 0; font-size: 14px; font-weight: bold; text-transform: uppercase; font-family: 'Times New Roman', serif;">KECAMATAN PATRANG</h2>
+                    <p style="margin: 5px 0 0 0; font-size: 14px; font-weight: bold; font-family: 'Times New Roman', serif;">Alamat : Jalan Cendrawasih No. 22 Telp. 486475 Jember</p>
+                </div>
+                <!-- Spacer for right side to keep text centered -->
+                <div style="width: 100px;"></div>
+            </div>
+
+            <div class="print-title">
+                <h3 style="margin-top: 0; font-size: 16px; font-weight: bold; text-decoration: underline; text-transform: uppercase; color: black;">Laporan Rekapitulasi Pelanggaran Siswa</h3>
+                <p style="font-size: 12px; margin-top: 5px; color: black;">
+                    @if($kelas_selected) Kelas: {{ $kelas_selected }} @endif
+                    @if($kelas_selected && $kategori_selected) | @endif
+                    @if($kategori_selected) Kategori: {{ ucfirst($kategori_selected) }} @endif
+                    @if(($kelas_selected || $kategori_selected) && $search) | @endif
+                    @if($search) Pencarian: "{{ $search }}" @endif
                 </p>
             </div>
 

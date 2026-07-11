@@ -15,7 +15,6 @@ class Siswa extends Model
         'nisn',
         'nama_lengkap',
         'jenis_kelamin',
-        'kelas',
         'class_id',
         'tahun_ajaran',
         'no_hp',

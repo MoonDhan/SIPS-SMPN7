@@ -49,9 +49,6 @@
                         <div class="stat-info">
                             <h3>Total Siswa</h3>
                             <p class="stat-number" id="totalSiswa">0</p>
-                            <span class="stat-change positive">
-                                <i class="fas fa-arrow-up"></i> 12% dari bulan lalu
-                            </span>
                         </div>
                     </div>
                     <div class="stat-card">
@@ -61,9 +58,6 @@
                         <div class="stat-info">
                             <h3>Pelanggaran</h3>
                             <p class="stat-number" id="totalPelanggaran">0</p>
-                            <span class="stat-change negative">
-                                <i class="fas fa-arrow-down"></i> 8% dari bulan lalu
-                            </span>
                         </div>
                     </div>
                     <!-- Status cards removed -->

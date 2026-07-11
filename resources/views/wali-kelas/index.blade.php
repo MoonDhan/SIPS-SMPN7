@@ -95,7 +95,7 @@
                                     <form action="{{ route('wali-kelas.destroy', $wali->id) }}" method="POST" style="display: inline;">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="btn-action btn-delete" onclick="return confirm('Apakah Anda yakin ingin menghapus data Wali Kelas ini? Tindakan ini tidak dapat dibatalkan.')" title="Hapus Wali Kelas">
+                                        <button type="button" class="btn-action btn-delete" onclick="confirmDelete(this.closest('form'))" title="Hapus Wali Kelas">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
@@ -112,5 +112,52 @@
             </section>
         </main>
     </div>
+
+    <!-- Modal Hapus -->
+    <div class="modal" id="modalHapus">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div class="modal-header" style="justify-content: center; border-bottom: none; padding-bottom: 0;">
+                <div style="background-color: #fee2e2; color: #ef4444; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+            </div>
+            <div class="modal-body" style="padding-top: 15px;">
+                <h3 style="margin-bottom: 10px; color: #1e293b;">Hapus Data Wali Kelas</h3>
+                <p style="font-size: 14px; color: #64748b; margin-bottom: 5px;">Apakah Anda yakin ingin menghapus data wali kelas ini?</p>
+                <p style="font-size: 13px; color: #ef4444;">Tindakan ini tidak dapat dibatalkan!</p>
+            </div>
+            <div class="modal-footer" style="justify-content: center; border-top: none;">
+                <button class="btn-cancel" id="modalHapusCancel">Batal</button>
+                <button class="btn-save" id="modalHapusConfirm" style="background-color: #ef4444;">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let formToDelete = null;
+        
+        function confirmDelete(form) {
+            formToDelete = form;
+            document.getElementById('modalHapus').classList.add('show');
+        }
+        
+        document.getElementById('modalHapusCancel').addEventListener('click', () => {
+            document.getElementById('modalHapus').classList.remove('show');
+            formToDelete = null;
+        });
+        
+        document.getElementById('modalHapusConfirm').addEventListener('click', () => {
+            if (formToDelete) {
+                formToDelete.submit();
+            }
+        });
+        
+        document.getElementById('modalHapus').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                document.getElementById('modalHapus').classList.remove('show');
+                formToDelete = null;
+            }
+        });
+    </script>
 </body>
 </html>

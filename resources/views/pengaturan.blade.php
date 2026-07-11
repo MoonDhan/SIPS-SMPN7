@@ -9,6 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
+    <!-- Cropper.js CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    
     @vite(['resources/css/dashboard.css', 'resources/js/pengaturan.js'])
 </head>
 <body>
@@ -78,7 +81,8 @@
                                 </div>
                                 <div style="display:flex; flex-direction:column; gap: 8px;">
                                     <label for="foto" class="upload-label">Unggah Foto Baru</label>
-                                    <input type="file" id="foto" name="foto" accept="image/*" style="font-size: 13px;">
+                                    <input type="file" id="foto" name="foto_upload" accept="image/*" style="font-size: 13px;">
+                                    <input type="hidden" name="foto_base64" id="foto_base64">
                                     <small class="text-muted">Rekomendasi ukuran square/kotak, Maksimal 2MB (JPG, PNG, SVG)</small>
                                     @error('foto') <span class="text-danger">{{ $message }}</span> @enderror
                                 </div>
@@ -237,6 +241,23 @@
         </main>
     </div>
 
+    <!-- Cropper Modal -->
+    <div id="cropModal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.8); align-items:center; justify-content:center;">
+        <div style="background:white; padding:20px; border-radius:12px; width:90%; max-width:600px;">
+            <h3 style="margin-top:0;">Sesuaikan Foto Profil</h3>
+            <div style="width:100%; max-height:400px; margin-bottom:20px;">
+                <img id="cropImage" src="" style="max-width:100%;">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button type="button" class="btn btn-secondary" id="btnCancelCrop">Batal</button>
+                <button type="button" class="btn btn-primary" id="btnApplyCrop">Potong & Terapkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cropper.js Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const tabs = document.querySelectorAll('.tab-btn');
@@ -274,18 +295,75 @@
                 targetBtn.click();
             }
 
-            // Image Preview handler
+            // Cropper handler
             const fotoInput = document.getElementById('foto');
             const previewDiv = document.getElementById('profilePreview');
+            const fotoBase64Input = document.getElementById('foto_base64');
+            
+            // Cropper variables
+            let cropper = null;
+            const cropModal = document.getElementById('cropModal');
+            const cropImage = document.getElementById('cropImage');
+            const btnCancelCrop = document.getElementById('btnCancelCrop');
+            const btnApplyCrop = document.getElementById('btnApplyCrop');
 
             fotoInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = (event) => {
-                        previewDiv.innerHTML = `<img src="${event.target.result}" alt="Preview Foto">`;
+                        // Set image src to cropper
+                        cropImage.src = event.target.result;
+                        // Show modal
+                        cropModal.style.display = 'flex';
+                        
+                        // Initialize Cropper
+                        if (cropper) {
+                            cropper.destroy();
+                        }
+                        cropper = new Cropper(cropImage, {
+                            aspectRatio: 1, // Square crop
+                            viewMode: 1,
+                            minCropBoxWidth: 100,
+                            minCropBoxHeight: 100,
+                        });
                     };
                     reader.readAsDataURL(file);
+                }
+            });
+
+            // Cancel Crop
+            btnCancelCrop.addEventListener('click', () => {
+                cropModal.style.display = 'none';
+                if (cropper) {
+                    cropper.destroy();
+                    cropper = null;
+                }
+                fotoInput.value = ''; // Reset input file
+            });
+
+            // Apply Crop
+            btnApplyCrop.addEventListener('click', () => {
+                if (cropper) {
+                    // Get cropped canvas
+                    const canvas = cropper.getCroppedCanvas({
+                        width: 400,
+                        height: 400,
+                    });
+                    
+                    // Convert to base64
+                    const base64Data = canvas.toDataURL('image/jpeg', 0.9);
+                    
+                    // Set to hidden input
+                    fotoBase64Input.value = base64Data;
+                    
+                    // Update preview
+                    previewDiv.innerHTML = `<img src="${base64Data}" alt="Preview Foto">`;
+                    
+                    // Close modal
+                    cropModal.style.display = 'none';
+                    cropper.destroy();
+                    cropper = null;
                 }
             });
         });

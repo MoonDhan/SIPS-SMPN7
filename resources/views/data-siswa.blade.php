@@ -107,11 +107,17 @@
                 </div>
                 <div class="filter-right">
                     @if(auth()->user()->isAdminBK() || auth()->user()->isGuruBK())
-                    <button class="btn-add" id="btnTambahSiswa">
+                    <button class="btn-add" id="btnTambahSiswa" style="margin-right: 0.5rem;">
                         <i class="fas fa-plus"></i> Tambah Siswa
                     </button>
+                    <button class="btn-export" id="btnNaikKelas" style="background-color: #f59e0b; color: white; border: none; margin-right: 0.5rem;">
+                        <i class="fas fa-level-up-alt"></i> Naik/Pindah Kelas
+                    </button>
+                    <button class="btn-export" id="btnImport" style="background-color: #10b981; color: white; border: none; margin-right: 0.5rem;">
+                        <i class="fas fa-file-excel"></i> Import Excel
+                    </button>
                     @endif
-                    <button class="btn-export">
+                    <button class="btn-export" id="btnExport">
                         <i class="fas fa-file-export"></i> Export
                     </button>
                 </div>
@@ -221,6 +227,87 @@
             <div class="modal-footer">
                 <button class="btn-cancel" id="modalCancel">Batal</button>
                 <button class="btn-save" id="modalSave">Simpan</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Naik/Pindah Kelas -->
+    <div class="modal" id="modalNaikKelas">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>Pindah Kelas Massal</h3>
+                <button class="modal-close" id="modalNaikKelasClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">Pindahkan seluruh siswa dari satu kelas ke kelas lain sekaligus.</p>
+                <form id="formNaikKelas">
+                    <div class="form-group">
+                        <label>Kelas Asal</label>
+                        <select id="kelasAsal" class="form-input" required>
+                            <option value="">Pilih Kelas Asal</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kelas Tujuan</label>
+                        <select id="kelasTujuan" class="form-input" required>
+                            <option value="">Pilih Kelas Tujuan</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="modalNaikKelasCancel">Batal</button>
+                <button class="btn-save" id="modalNaikKelasSave" style="background-color: #f59e0b;">Proses Pindah</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Hapus -->
+    <div class="modal" id="modalHapus">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div class="modal-header" style="justify-content: center; border-bottom: none; padding-bottom: 0;">
+                <div style="background-color: #fee2e2; color: #ef4444; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+            </div>
+            <div class="modal-body" style="padding-top: 15px;">
+                <h3 style="margin-bottom: 10px; color: #1e293b;">Hapus Data Siswa</h3>
+                <p style="font-size: 14px; color: #64748b; margin-bottom: 5px;">Apakah Anda yakin ingin menghapus data siswa ini?</p>
+                <p style="font-size: 13px; color: #ef4444;">Tindakan ini tidak dapat dibatalkan!</p>
+            </div>
+            <div class="modal-footer" style="justify-content: center; border-top: none;">
+                <button class="btn-cancel" id="modalHapusCancel">Batal</button>
+                <button class="btn-save" id="modalHapusConfirm" style="background-color: #ef4444;">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Import Excel -->
+    <div class="modal" id="modalImport">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>Import Data Siswa</h3>
+                <button class="modal-close" id="modalImportClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">Unggah file Excel (.xlsx) untuk memasukkan data siswa secara massal.</p>
+                <div style="margin-bottom: 15px;">
+                    <a href="/api/siswa/template" class="btn-add" style="display: block; text-align: center; background-color: #3b82f6; text-decoration: none;">
+                        <i class="fas fa-download"></i> Download Template Excel
+                    </a>
+                </div>
+                <form id="formImport">
+                    <div class="form-group">
+                        <label>File Excel (.xlsx)</label>
+                        <input type="file" id="fileExcel" class="form-input" accept=".xlsx, .xls" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="modalImportCancel">Batal</button>
+                <button class="btn-save" id="modalImportSave" style="background-color: #10b981;">Import Data</button>
             </div>
         </div>
     </div>

@@ -34,7 +34,9 @@ class LaporanController extends Controller
         // Filter Kelas
         if ($kelas_selected) {
             $query->whereHas('siswa', function ($q) use ($kelas_selected) {
-                $q->where('kelas', $kelas_selected);
+                $q->whereHas('kelasRelation', function($q2) use ($kelas_selected) {
+                    $q2->where('nama', $kelas_selected);
+                });
             });
         }
 

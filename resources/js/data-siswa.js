@@ -158,18 +158,40 @@ window.editSiswa = function (id) {
     document.getElementById('modalSiswa').classList.add('show');
 };
 
-window.deleteSiswa = async function (id) {
-    if (!confirm('Apakah Anda yakin ingin menghapus data siswa ini?')) return;
+let currentDeleteId = null;
 
+window.deleteSiswa = function (id) {
+    currentDeleteId = id;
+    document.getElementById('modalHapus').classList.add('show');
+};
+
+document.getElementById('modalHapusCancel').addEventListener('click', () => {
+    document.getElementById('modalHapus').classList.remove('show');
+    currentDeleteId = null;
+});
+
+document.getElementById('modalHapusConfirm').addEventListener('click', async () => {
+    if (!currentDeleteId) return;
+    
+    document.getElementById('modalHapus').classList.remove('show');
     try {
-        await window.axios.delete(`/api/siswa/${id}`);
+        await window.axios.delete(`/api/siswa/${currentDeleteId}`);
         showToast('Data siswa berhasil dihapus', 'success');
         await loadSiswa();
         await loadStats();
     } catch (error) {
         showToast(error.response?.data?.message || 'Gagal menghapus data siswa', 'error');
+    } finally {
+        currentDeleteId = null;
     }
-};
+});
+
+document.getElementById('modalHapus').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) {
+        document.getElementById('modalHapus').classList.remove('show');
+        currentDeleteId = null;
+    }
+});
 
 function showToast(message, type = 'success') {
     const toast = document.createElement('div');
@@ -264,6 +286,143 @@ document.getElementById('modalSave').addEventListener('click', async () => {
         showToast(message, 'error');
     }
 });
+
+// Fitur Naik/Pindah Kelas Massal
+const btnNaikKelas = document.getElementById('btnNaikKelas');
+if (btnNaikKelas) {
+    btnNaikKelas.addEventListener('click', () => {
+        document.getElementById('formNaikKelas').reset();
+        document.getElementById('modalNaikKelas').classList.add('show');
+    });
+
+    document.getElementById('modalNaikKelasClose').addEventListener('click', () => {
+        document.getElementById('modalNaikKelas').classList.remove('show');
+    });
+
+    document.getElementById('modalNaikKelasCancel').addEventListener('click', () => {
+        document.getElementById('modalNaikKelas').classList.remove('show');
+    });
+
+    document.getElementById('modalNaikKelas').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) {
+            document.getElementById('modalNaikKelas').classList.remove('show');
+        }
+    });
+
+    document.getElementById('modalNaikKelasSave').addEventListener('click', async () => {
+        const kelasAsal = document.getElementById('kelasAsal').value;
+        const kelasTujuan = document.getElementById('kelasTujuan').value.trim();
+
+        if (!kelasAsal || !kelasTujuan) {
+            showToast('Pilih kelas asal dan isi kelas tujuan!', 'error');
+            return;
+        }
+
+        if (!confirm(`Yakin ingin memindahkan semua siswa dari kelas ${kelasAsal} ke ${kelasTujuan}?`)) return;
+
+        try {
+            const btn = document.getElementById('modalNaikKelasSave');
+            btn.disabled = true;
+            btn.textContent = 'Memproses...';
+
+            const response = await window.axios.post('/api/siswa/bulk-move', {
+                kelas_asal: kelasAsal,
+                kelas_tujuan: kelasTujuan
+            });
+
+            showToast(response.data.message || 'Siswa berhasil dipindahkan', 'success');
+            document.getElementById('modalNaikKelas').classList.remove('show');
+            
+            await loadKelasOptions();
+            await loadSiswa();
+            await loadStats();
+        } catch (error) {
+            const message = error.response?.data?.message || 'Gagal memindahkan siswa';
+            showToast(message, 'error');
+        } finally {
+            const btn = document.getElementById('modalNaikKelasSave');
+            btn.disabled = false;
+            btn.textContent = 'Proses Pindah';
+        }
+    });
+}
+
+// Fitur Import Excel
+const btnImport = document.getElementById('btnImport');
+if (btnImport) {
+    btnImport.addEventListener('click', () => {
+        document.getElementById('formImport').reset();
+        document.getElementById('modalImport').classList.add('show');
+    });
+
+    document.getElementById('modalImportClose').addEventListener('click', () => {
+        document.getElementById('modalImport').classList.remove('show');
+    });
+
+    document.getElementById('modalImportCancel').addEventListener('click', () => {
+        document.getElementById('modalImport').classList.remove('show');
+    });
+
+    document.getElementById('modalImport').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) {
+            document.getElementById('modalImport').classList.remove('show');
+        }
+    });
+
+    document.getElementById('modalImportSave').addEventListener('click', async () => {
+        const fileInput = document.getElementById('fileExcel');
+        const file = fileInput.files[0];
+
+        if (!file) {
+            showToast('Pilih file Excel terlebih dahulu!', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const btn = document.getElementById('modalImportSave');
+            btn.disabled = true;
+            btn.textContent = 'Mengimport...';
+
+            const response = await window.axios.post('/api/siswa/import', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            showToast(response.data.message || 'Import berhasil', 'success');
+            document.getElementById('modalImport').classList.remove('show');
+            
+            await loadKelasOptions();
+            await loadSiswa();
+            await loadStats();
+        } catch (error) {
+            const message = error.response?.data?.message || 'Gagal mengimport data';
+            showToast(message, 'error');
+        } finally {
+            const btn = document.getElementById('modalImportSave');
+            btn.disabled = false;
+            btn.textContent = 'Import Data';
+        }
+    });
+}
+
+// Fitur Export Excel
+const btnExport = document.getElementById('btnExport');
+if (btnExport) {
+    btnExport.addEventListener('click', () => {
+        const kelas = document.getElementById('filterKelas').value;
+        const status = document.getElementById('filterStatus').value;
+        const search = document.getElementById('searchSiswa').value;
+        
+        let url = `/api/siswa/export?kelas=${kelas}&status=${status}`;
+        if (search) {
+            url += `&search=${encodeURIComponent(search)}`;
+        }
+        
+        window.location.href = url;
+    });
+}
 
 document.getElementById('menuToggle').addEventListener('click', () => {
     document.getElementById('sidebar').classList.toggle('open');
@@ -438,6 +597,8 @@ async function loadKelasOptions() {
 
         const filterKelas = document.getElementById('filterKelas');
         const formKelas = document.getElementById('kelas');
+        const formKelasAsal = document.getElementById('kelasAsal');
+        const formKelasTujuan = document.getElementById('kelasTujuan');
 
         if (filterKelas) {
             filterKelas.innerHTML = '<option value="all">Semua Kelas</option>';
@@ -456,6 +617,28 @@ async function loadKelasOptions() {
                 opt.value = cls;
                 opt.textContent = cls;
                 formKelas.appendChild(opt);
+            });
+        }
+        
+        if (formKelasAsal) {
+            formKelasAsal.innerHTML = '<option value="">Pilih Kelas Asal</option>';
+            classes.forEach(cls => {
+                if (cls.toLowerCase() !== 'lulus') {
+                    const opt = document.createElement('option');
+                    opt.value = cls;
+                    opt.textContent = cls;
+                    formKelasAsal.appendChild(opt);
+                }
+            });
+        }
+
+        if (formKelasTujuan) {
+            formKelasTujuan.innerHTML = '<option value="">Pilih Kelas Tujuan</option>';
+            classes.forEach(cls => {
+                const opt = document.createElement('option');
+                opt.value = cls;
+                opt.textContent = cls;
+                formKelasTujuan.appendChild(opt);
             });
         }
     } catch (error) {

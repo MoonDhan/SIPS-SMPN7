@@ -60,13 +60,37 @@ class PengaturanController extends Controller
             'ni_pppk' => 'nullable|string|max:20|unique:users,ni_pppk,' . $user->id,
             'no_hp' => 'nullable|string|max:20',
             'alamat' => 'nullable|string',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
+            'foto_upload' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
+            'foto_base64' => 'nullable|string',
         ]);
 
         $data = $request->only(['name', 'email', 'nip', 'ni_pppk', 'no_hp', 'alamat']);
 
-        if ($request->hasFile('foto')) {
-            $file = $request->file('foto');
+        if ($request->filled('foto_base64')) {
+            $base64Image = $request->input('foto_base64');
+            // Extract the base64 string
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64Image, $type)) {
+                $base64Image = substr($base64Image, strpos($base64Image, ',') + 1);
+                $type = strtolower($type[1]);
+
+                $image = base64_decode($base64Image);
+                $filename = 'profile_' . $user->id . '_' . time() . '.' . $type;
+                $destinationPath = public_path('uploads/profile');
+                
+                if (!File::exists($destinationPath)) {
+                    File::makeDirectory($destinationPath, 0755, true);
+                }
+
+                // Hapus foto lama jika ada
+                if ($user->foto && File::exists(public_path($user->foto))) {
+                    File::delete(public_path($user->foto));
+                }
+
+                file_put_contents($destinationPath . '/' . $filename, $image);
+                $data['foto'] = 'uploads/profile/' . $filename;
+            }
+        } else if ($request->hasFile('foto_upload')) {
+            $file = $request->file('foto_upload');
             $filename = 'profile_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
             
             // Simpan ke public/uploads/profile
