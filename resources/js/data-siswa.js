@@ -338,32 +338,56 @@ if (btnNaikKelas) {
             return;
         }
 
-        if (!confirm(`Yakin ingin memindahkan semua siswa dari kelas ${kelasAsal} ke ${kelasTujuan}?`)) return;
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const bgColor = isDark ? '#1e293b' : '#ffffff';
+        const textColor = isDark ? '#f8fafc' : '#1e293b';
 
-        try {
-            const btn = document.getElementById('modalNaikKelasSave');
-            btn.disabled = true;
-            btn.textContent = 'Memproses...';
+        Swal.fire({
+            title: 'Konfirmasi Pindah Kelas',
+            html: `Yakin ingin memindahkan semua siswa dari kelas <strong>${kelasAsal}</strong> ke <strong>${kelasTujuan}</strong>?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#f59e0b',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Ya, Pindahkan!',
+            cancelButtonText: 'Batal',
+            background: bgColor,
+            color: textColor
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const btn = document.getElementById('modalNaikKelasSave');
+                    btn.disabled = true;
+                    btn.textContent = 'Memproses...';
 
-            const response = await window.axios.post('/api/siswa/bulk-move', {
-                kelas_asal: kelasAsal,
-                kelas_tujuan: kelasTujuan
-            });
+                    const response = await window.axios.post('/api/siswa/bulk-move', {
+                        kelas_asal: kelasAsal,
+                        kelas_tujuan: kelasTujuan
+                    });
 
-            showToast(response.data.message || 'Siswa berhasil dipindahkan', 'success');
-            document.getElementById('modalNaikKelas').classList.remove('show');
-            
-            await loadKelasOptions();
-            await loadSiswa();
-            await loadStats();
-        } catch (error) {
-            const message = error.response?.data?.message || 'Gagal memindahkan siswa';
-            showToast(message, 'error');
-        } finally {
-            const btn = document.getElementById('modalNaikKelasSave');
-            btn.disabled = false;
-            btn.textContent = 'Proses Pindah';
-        }
+                    showToast(response.data.message || 'Siswa berhasil dipindahkan', 'success');
+                    document.getElementById('modalNaikKelas').classList.remove('show');
+                    
+                    await loadKelasOptions();
+                    await loadSiswa();
+                    await loadStats();
+                } catch (error) {
+                    const message = error.response?.data?.message || 'Gagal memindahkan siswa';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Memindahkan Kelas',
+                        text: message,
+                        background: bgColor,
+                        color: textColor,
+                        confirmButtonColor: '#ef4444'
+                    });
+                } finally {
+                    const btn = document.getElementById('modalNaikKelasSave');
+                    btn.disabled = false;
+                    btn.textContent = 'Proses Pindah';
+                }
+            }
+        });
     });
 }
 

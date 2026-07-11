@@ -176,6 +176,15 @@ class SiswaController extends Controller
         }
         
         $kelasTujuan = \App\Models\Kelas::firstOrCreate(['nama' => $request->kelas_tujuan]);
+        
+        // Cek apakah kelas tujuan sudah memiliki siswa (mencegah tercampur)
+        $jumlahSiswaTujuan = Siswa::where('class_id', $kelasTujuan->id)->count();
+        if ($jumlahSiswaTujuan > 0) {
+            return response()->json([
+                'message' => 'Gagal! Kelas tujuan (' . $request->kelas_tujuan . ') masih berisi ' . $jumlahSiswaTujuan . ' siswa. Silakan pindahkan/luluskan siswa di kelas ' . $request->kelas_tujuan . ' terlebih dahulu.'
+            ], 422);
+        }
+
         $waliTujuan = \App\Models\WaliKelas::where('kelas_wali', $request->kelas_tujuan)->first();
         
         Siswa::where('class_id', $kelasAsal->id)->update([
